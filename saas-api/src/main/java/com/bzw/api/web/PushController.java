@@ -13,7 +13,7 @@ public class PushController {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
-    @MessageMapping("listen/{userId}")
+    @MessageMapping("websocket/listen/{userId}")
     @ApiMethodAttribute(nonSignatureValidation = true,nonSessionValidation = true)
     public Object listen(@PathVariable Long userId) {
         messagingTemplate.convertAndSend("listen/" + userId.toString(), "ready");

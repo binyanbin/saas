@@ -120,9 +120,16 @@ public class TechnicianQueryBiz {
         return technicianMapper.selectByPrimaryKey(technicianId);
     }
 
-    public List<Technician> listTechnicianByBranchId(Long branchId){
+    public List<Technician> listTechnicianByBranchId(Long branchId, int sort) {
+
         TechnicianExample technicianExample = new TechnicianExample();
         technicianExample.createCriteria().andBranchIdEqualTo(branchId).andStatusIdEqualTo(Status.Valid.getValue());
+        if (sort == 1) {
+            technicianExample.setOrderByClause(" praise desc");
+        }
+        else if (sort == 2){
+            technicianExample.setOrderByClause(" order_count desc");
+        }
         return technicianMapper.selectByExample(technicianExample);
     }
 

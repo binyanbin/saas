@@ -11,6 +11,15 @@ public class TechnicianDTO {
     private Long id;
     private String jobNumber;
     private Integer praise;
+    private Integer orderCount;
+
+    public Integer getOrderCount() {
+        return orderCount;
+    }
+
+    public void setOrderCount(Integer orderCount) {
+        this.orderCount = orderCount;
+    }
 
     public Integer getPraise() {
         return praise;

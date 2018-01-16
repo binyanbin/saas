@@ -6,6 +6,7 @@ import com.bzw.common.web.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -23,8 +24,8 @@ public class BranchController extends BaseController {
 
     @RequestMapping("/{branchId}/technicians")
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
-    public Object listTechnicians(@PathVariable Long branchId){
-        return wrapperJsonView(customerQueryService.listTechnicianByBranchId(branchId));
+    public Object listTechnicians(@PathVariable Long branchId, @RequestParam(required = false,defaultValue = "1") Integer sort){
+        return wrapperJsonView(customerQueryService.listTechnicianByBranchId(branchId,sort));
     }
 
     @RequestMapping("/{branchId}/projects")

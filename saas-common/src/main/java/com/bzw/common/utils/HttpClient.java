@@ -11,14 +11,19 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.routing.HttpRoute;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
@@ -26,12 +31,13 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.*;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +54,8 @@ public class HttpClient {
     private static final int timeOut = 5 * 1000;
 
     private static CloseableHttpClient httpClient = null;
+
+    private static CloseableHttpClient sslClient = null;
 
     private static final Object syncLock = new Object();
 
@@ -253,7 +261,8 @@ public class HttpClient {
             response = getHttpClient(url).execute(httppost,
                     HttpClientContext.create());
             HttpEntity entity = response.getEntity();
-            return EntityUtils.toByteArray(entity);
+            byte[] result =  EntityUtils.toByteArray(entity);
+            return result;
         } catch (Exception e) {
             logger.error(e, e);
         } finally {
@@ -360,6 +369,43 @@ public class HttpClient {
             }
             myResult = false;
             return this;
+        }
+    }
+
+    /**
+     * 用于进行Https请求的HttpClient
+     * @ClassName: SSLClient
+     * @Description: TODO
+     * @author Devin <xxx>
+     * @date 2017年2月7日 下午1:42:07
+     *
+     */
+    public class SSLClient extends DefaultHttpClient {
+        SSLClient() throws Exception{
+            super();
+            SSLContext ctx = SSLContext.getInstance("TLS");
+            X509TrustManager tm = new X509TrustManager() {
+
+                @Override
+                public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+
+                }
+
+                @Override
+                public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+
+                }
+
+                @Override
+                public X509Certificate[] getAcceptedIssuers() {
+                    return new X509Certificate[0];
+                }
+            };
+            ctx.init(null, new TrustManager[]{tm}, null);
+            SSLSocketFactory ssf = new SSLSocketFactory(ctx, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+            ClientConnectionManager ccm = this.getConnectionManager();
+            SchemeRegistry sr = ccm.getSchemeRegistry();
+            sr.register(new Scheme("https", 443, ssf));
         }
     }
 }

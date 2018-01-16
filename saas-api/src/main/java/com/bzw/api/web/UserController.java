@@ -3,7 +3,7 @@ package com.bzw.api.web;
 import com.bzw.api.module.basic.param.LoginParam;
 import com.bzw.api.module.basic.service.CustomerEventService;
 import com.bzw.common.content.ApiMethodAttribute;
-import com.bzw.common.exception.api.LoginFailException;
+import com.bzw.common.exception.api.UserLoginFailException;
 import com.bzw.common.utils.WebUtils;
 import com.bzw.common.web.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,10 +41,10 @@ public class UserController extends BaseController {
 
     @RequestMapping(value = "/login/code/{code}", method = {RequestMethod.OPTIONS, RequestMethod.POST})
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
-    public Object codeLogin(@PathVariable String code) {
-        String openId = customerEventService.getOpenId(appid, secret, code);
+    public Object codeLogin(@PathVariable String jscode) {
+        String openId = customerEventService.getOpenId(appid, secret, jscode);
         if (null == openId)
-            throw new LoginFailException();
+            throw new UserLoginFailException();
         return wrapperJsonView(customerEventService.openIdLogin(openId));
     }
 
@@ -60,9 +60,16 @@ public class UserController extends BaseController {
         String accessToken = customerEventService.getAccessToken(appid,secret);
         response.setContentType("image/png");
         OutputStream stream = response.getOutputStream();
-        stream.write(customerEventService.getGrCode("/user/page/index",accessToken,"roomId="+roomId.toString()));
+        stream.write(customerEventService.getGrCode("pages/projectlist/projectlist",accessToken,"room_"+roomId.toString()));
         stream.flush();
         stream.close();
+//        return wrapperJsonView(customerEventService.getGrCode("pages/projectlist/projectlist",accessToken,roomId.toString()));
+    }
+
+    @RequestMapping(value="wechat/openId/{jscode}")
+    @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
+    public Object getOpenId(@PathVariable String jscode) {
+        return wrapperJsonView(customerEventService.getOpenId(appid, secret, jscode));
     }
 
 

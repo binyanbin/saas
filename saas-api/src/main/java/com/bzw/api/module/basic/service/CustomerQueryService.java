@@ -115,8 +115,8 @@ public class CustomerQueryService {
         return transferTechnicians(technicians);
     }
 
-    public List<TechnicianDTO> listTechnicianByBranchId(Long branchId) {
-        List<Technician> technicians = technicianQueryBiz.listTechnicianByBranchId(branchId);
+    public List<TechnicianDTO> listTechnicianByBranchId(Long branchId,int sort) {
+        List<Technician> technicians = technicianQueryBiz.listTechnicianByBranchId(branchId,sort);
         return transferTechnicians(technicians);
     }
 
@@ -133,6 +133,7 @@ public class CustomerQueryService {
             technicianDTO.setId(technician.getId());
             technicianDTO.setJobNumber(technician.getJobNumber());
             technicianDTO.setPraise(technician.getPraise());
+            technicianDTO.setOrderCount(technician.getOrderCount());
             result.add(technicianDTO);
         }
         return result;

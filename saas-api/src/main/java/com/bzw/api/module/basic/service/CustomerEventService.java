@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -76,8 +77,8 @@ public class CustomerEventService {
         }
     }
 
-    public byte[] getGrCode(String page,String accessToken,String scene){
-        String url = String.format("https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=%s",accessToken);
+    public byte[] getGrCode(String page,String accessToken,String scene) throws IOException {
+        String url = String.format("http://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=%s",accessToken);
         WechatQRCodeParam param = new WechatQRCodeParam();
         param.setPage(page);
         param.setScene(scene);

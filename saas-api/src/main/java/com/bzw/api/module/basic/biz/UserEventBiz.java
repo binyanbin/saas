@@ -14,7 +14,8 @@ import com.bzw.api.module.platform.model.UserExample;
 import com.bzw.common.content.WebSession;
 import com.bzw.common.content.WebSessionManager;
 import com.bzw.common.enums.Status;
-import com.bzw.common.exception.api.LoginFailException;
+import com.bzw.common.exception.api.UserLoginFailException;
+import com.bzw.common.exception.api.WechatLoginFailException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -45,13 +46,13 @@ public class UserEventBiz {
         userExample.createCriteria().andCodeEqualTo(code).andPasswordEqualTo(password).andStatusIdEqualTo(Status.Valid.getValue());
         List<User> users = userMapper.selectByExample(userExample);
         if (CollectionUtils.isEmpty(users))
-            throw new LoginFailException();
+            throw new UserLoginFailException();
         User user = users.get(0);
         EmployeeExample employeeExample = new EmployeeExample();
         employeeExample.createCriteria().andUserIdEqualTo(user.getId()).andStatusIdEqualTo(Status.Valid.getValue());
         List<Employee> employees = employeeMapper.selectByExample(employeeExample);
         if (CollectionUtils.isEmpty(employees))
-            throw new LoginFailException();
+            throw new UserLoginFailException();
         Employee employee = employees.get(0);
         WebSession webSession = new WebSession();
         webSession.setTenantId(employee.getTenantId());
@@ -75,13 +76,13 @@ public class UserEventBiz {
         employeeExample.createCriteria().andWechatIdEqualTo(openId).andStatusIdEqualTo(Status.Valid.getValue());
         List<Employee> employees = employeeMapper.selectByExample(employeeExample);
         if (CollectionUtils.isEmpty(employees))
-            throw new LoginFailException();
+            throw new WechatLoginFailException();
         Employee employee = employees.get(0);
         UserExample userExample = new UserExample();
         userExample.createCriteria().andIdEqualTo(employee.getUserId()).andStatusIdEqualTo(Status.Valid.getValue());
         List<User> users = userMapper.selectByExample(userExample);
         if (CollectionUtils.isEmpty(users))
-            throw new LoginFailException();
+            throw new WechatLoginFailException();
         User user = users.get(0);
         WebSession webSession = new WebSession();
         webSession.setTenantId(employee.getTenantId());
