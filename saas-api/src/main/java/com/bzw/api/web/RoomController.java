@@ -7,11 +7,22 @@ import com.bzw.common.utils.WebUtils;
 import com.bzw.common.web.BaseController;
 import com.google.common.base.Preconditions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
 
 @RestController
 @RequestMapping("rooms")
 public class RoomController extends BaseController {
+
+    @Value("${wechat.appid}")
+    private String appid;
+
+    @Value("${wechat.secret}")
+    private String secret;
 
     @Autowired
     CustomerQueryService customerQueryService;
@@ -37,11 +48,29 @@ public class RoomController extends BaseController {
         return wrapperJsonView(customerQueryService.getRoom(roomId));
     }
 
+    @RequestMapping("/{roomId}/order")
+    @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
+    public Object getOrder(@PathVariable Long roomId) {
+        return wrapperJsonView(customerQueryService.getOrderByRoomId(roomId));
+    }
+
     @RequestMapping(value = "/{roomId}", method = {RequestMethod.POST, RequestMethod.OPTIONS})
     @ApiMethodAttribute(nonSignatureValidation = true)
     public Object updateRoomState(@PathVariable Long roomId, @RequestParam Integer statusId) {
         Preconditions.checkArgument(customerQueryService.getRoom(roomId) != null, "房间id不存在");
         return wrapperJsonView(customerEventService.updateRoomState(roomId, statusId, WebUtils.Session.getEmployeeId()));
     }
+
+    @RequestMapping(value = "{roomId}/qrcode", method = {RequestMethod.GET})
+    @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
+    public void QRcode(@PathVariable Long roomId, HttpServletResponse response) throws IOException {
+        String accessToken = customerEventService.getAccessToken(appid, secret);
+        response.setContentType("image/png");
+        OutputStream stream = response.getOutputStream();
+        stream.write(customerEventService.getGrCode("pages/projectlist/projectlist", accessToken, "room_" + roomId.toString()));
+        stream.flush();
+        stream.close();
+    }
+
 
 }

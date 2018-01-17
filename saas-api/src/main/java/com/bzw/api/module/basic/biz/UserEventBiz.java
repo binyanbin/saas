@@ -66,6 +66,7 @@ public class UserEventBiz {
         webSession.setBranchName(branch.getName());
         Tenant tenant = tenantMapper.selectByPrimaryKey(employee.getTenantId());
         webSession.setTenantName(tenant.getName());
+        webSession.setOpenId(employee.getWechatId());
         user.setLastLoginDate(new Date());
         userMapper.updateByPrimaryKeySelective(user);
         return webSessionManager.add(webSession, webSessionManager.newId(user.getId()), webSessionManager.newSecretKey());

@@ -11,10 +11,13 @@ import com.bzw.api.module.basic.enums.RoomState;
 import com.bzw.api.module.basic.enums.TechnicianState;
 import com.bzw.api.module.basic.model.*;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CustomerQueryService {
@@ -84,6 +87,8 @@ public class CustomerQueryService {
         return result;
     }
 
+
+
     public List<RoomDTO> listRoomsByBranchId(Long branchId) {
         List<Room> rooms = roomQueryBiz.listRoomByBranchId(branchId);
         return transferRooms(rooms);
@@ -115,8 +120,8 @@ public class CustomerQueryService {
         return transferTechnicians(technicians);
     }
 
-    public List<TechnicianDTO> listTechnicianByBranchId(Long branchId,int sort) {
-        List<Technician> technicians = technicianQueryBiz.listTechnicianByBranchId(branchId,sort);
+    public List<TechnicianDTO> listTechnicianByBranchId(Long branchId, int sort) {
+        List<Technician> technicians = technicianQueryBiz.listTechnicianByBranchId(branchId, sort);
         return transferTechnicians(technicians);
     }
 
@@ -175,13 +180,64 @@ public class CustomerQueryService {
         Order order = orderQueryBiz.getOrder(orderId);
         if (order == null)
             return null;
-        List<OrderDetail> orderDetails = Lists.newArrayList();
-        orderDetails = orderQueryBiz.listOrderDetail(orderId);
+        List<OrderDetail> orderDetails = orderQueryBiz.listOrderDetail(orderId);
         result.setStateId(order.getBizStatusId());
         result.setStateName(OrderState.parse(order.getBizStatusId()).getDesc());
         result.setBranchName(orderDetails.get(0).getBranchName());
         result.setPrice(order.getPrice());
         List<OrderDetailDTO> detailDTOList = Lists.newArrayList();
+        transferOrderDetailDTO(orderDetails, detailDTOList);
+        result.setDetails(detailDTOList);
+        return result;
+    }
+    public OrderDTO getOrderByRoomId(Long roomId) {
+        Room room = roomQueryBiz.getRoom(roomId);
+        if (room.getOrderId() != null && room.getOrderId() > 0L) {
+            return getOrder(room.getOrderId());
+        } else {
+            return null;
+        }
+    }
+
+    public List<OrderDTO> listOrder(String openId) {
+        List<OrderDTO> result = Lists.newArrayList();
+        List<Order> orders = orderQueryBiz.listOrder(openId);
+        if (CollectionUtils.isEmpty(orders)) {
+            return result;
+        }
+        List<Long> orderIds = Lists.newArrayList();
+        for (Order order : orders) {
+            orderIds.add(order.getId());
+        }
+        List<OrderDetail> orderDetails = orderQueryBiz.listOrderDetail(orderIds);
+        Map<Long, List<OrderDetail>> mapOrderDetail = Maps.newHashMap();
+        if (CollectionUtils.isEmpty(orderDetails)) {
+            return result;
+        }
+        orderDetails.forEach(t -> {
+            if (mapOrderDetail.containsKey(t.getOrderId())) {
+                List<OrderDetail> orderDetailList = mapOrderDetail.get(t.getOrderId());
+                orderDetailList.add(t);
+            } else {
+                mapOrderDetail.put(t.getOrderId(), Lists.newArrayList(t));
+            }
+        });
+        for (Order order : orders) {
+            OrderDTO orderDTO = new OrderDTO();
+            orderDTO.setStateId(order.getBizStatusId());
+            orderDTO.setStateName(OrderState.parse(order.getBizStatusId()).getDesc());
+            orderDTO.setBranchName(orderDetails.get(0).getBranchName());
+            orderDTO.setPrice(order.getPrice());
+            List<OrderDetail> orderDetailList = mapOrderDetail.get(order.getId());
+            List<OrderDetailDTO> detailDTOList = Lists.newArrayList();
+            transferOrderDetailDTO(orderDetailList, detailDTOList);
+            orderDTO.setDetails(detailDTOList);
+            result.add(orderDTO);
+        }
+        return result;
+    }
+
+    private void transferOrderDetailDTO(List<OrderDetail> orderDetails, List<OrderDetailDTO> detailDTOList) {
         for (OrderDetail orderDetail : orderDetails) {
             OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
             orderDetailDTO.setBookTime(orderDetail.getBookTime());
@@ -194,8 +250,6 @@ public class CustomerQueryService {
             orderDetailDTO.setTechnicianName(orderDetail.getTechnicianName());
             detailDTOList.add(orderDetailDTO);
         }
-        result.setDetails(detailDTOList);
-        return result;
     }
 
 }

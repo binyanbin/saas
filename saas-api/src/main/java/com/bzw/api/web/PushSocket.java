@@ -44,19 +44,19 @@ public class PushSocket {
         }
     }
 
-    public void sendMessage (String message) throws IOException {
+    private void sendMessage(String message) throws IOException {
         this.session.getBasicRemote().sendText(message);
     }
 
-    public static synchronized  int getOnlineCount (){
+    private static synchronized  int getOnlineCount(){
         return PushSocket.onlineCount;
     }
 
-    public static synchronized void addOnlineCount (){
+    private static synchronized void addOnlineCount(){
         PushSocket.onlineCount++;
     }
 
-    public static synchronized void subOnlineCount (){
+    private static synchronized void subOnlineCount(){
         PushSocket.onlineCount--;
     }
 

@@ -141,6 +141,8 @@ public class OrderEventBiz {
         for(OrderDetail orderDetail :orderDetails){
             orderDetailMapper.insert(orderDetail);
         }
+        room.setOrderId(orderId);
+        roomMapper.updateByPrimaryKeySelective(room);
         return order.getId();
     }
 
