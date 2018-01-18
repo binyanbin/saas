@@ -31,18 +31,24 @@ public class RoomQueryBiz {
         return roomMapper.selectByPrimaryKey(roomId);
     }
 
-    public List<Room> listRoomByBranchId(Long branchId){
+    public List<Room> listRoomByBranchId(Long branchId) {
         RoomExample roomExample = new RoomExample();
         roomExample.createCriteria().andBranchIdEqualTo(branchId).andStatusIdEqualTo(Status.Valid.getValue());
         return roomMapper.selectByExample(roomExample);
     }
 
-    public List<Room> listRoomByProjectId(Integer projectId){
+    public List<Room> listRoomByProjectId(Integer projectId) {
         Project project = projectMapper.selectByPrimaryKey(projectId);
         Integer type = project.getType();
         Long branchId = project.getBranchId();
         RoomExample roomExample = new RoomExample();
         roomExample.createCriteria().andBranchIdEqualTo(branchId).andTypeEqualTo(type);
-        return  roomMapper.selectByExample(roomExample);
+        return roomMapper.selectByExample(roomExample);
+    }
+
+    public List<Room> listRoomByIds(List<Long> roomIds) {
+        RoomExample roomExample = new RoomExample();
+        roomExample.createCriteria().andIdIn(roomIds);
+        return roomMapper.selectByExample(roomExample);
     }
 }

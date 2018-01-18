@@ -60,4 +60,8 @@ public class RoomEventBiz {
             return false;
         }
     }
+
+    public void updateRoom(Room room){
+        roomMapper.updateByPrimaryKeySelective(room);
+    }
 }

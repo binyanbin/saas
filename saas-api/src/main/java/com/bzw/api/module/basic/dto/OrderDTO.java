@@ -8,7 +8,16 @@ public class OrderDTO {
     private BigDecimal price;
     private Integer stateId;
     private String stateName;
+    private Long id;
     private List<OrderDetailDTO> details;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public List<OrderDetailDTO> getDetails() {
         return details;

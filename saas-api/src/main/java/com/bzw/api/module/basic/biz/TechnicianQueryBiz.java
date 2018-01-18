@@ -26,61 +26,7 @@ public class TechnicianQueryBiz {
     private TechnicianProjectMapper technicianProjectMapper;
 
     @Autowired
-    private ProjectMapper projectMapper;
-
-    @Autowired
     private TechnicianPhotoMapper technicianPhotoMapper;
-
-    public List<Project> listProjectByTechnicianId(Long technicianId) {
-        TechnicianProjectExample technicianProjectExample = new TechnicianProjectExample();
-        technicianProjectExample.createCriteria().andTechnicianIdEqualTo(technicianId);
-        List<TechnicianProject> technicianProjects = technicianProjectMapper.selectByExample(technicianProjectExample);
-        List<Integer> projectIds = Lists.newArrayList();
-        for (TechnicianProject project : technicianProjects) {
-            projectIds.add(project.getProjectId());
-        }
-        ProjectExample projectExample = new ProjectExample();
-        projectExample.createCriteria().andIdIn(projectIds);
-        List<Project> result = projectMapper.selectByExample(projectExample);
-        if (CollectionUtils.isEmpty(result)) {
-            return Lists.newArrayList();
-        } else {
-            return result;
-        }
-    }
-
-    public Map<Long, List<Project>> listTechnicianProject(List<Long> technicianIds) {
-        Map<Long, List<Project>> result = Maps.newHashMap();
-        TechnicianProjectExample technicianProjectExample = new TechnicianProjectExample();
-        technicianProjectExample.createCriteria().andTechnicianIdIn(technicianIds);
-        List<TechnicianProject> technicianProjects = technicianProjectMapper.selectByExample(technicianProjectExample);
-        List<Integer> projectIds = Lists.newArrayList();
-        for (TechnicianProject project : technicianProjects) {
-            projectIds.add(project.getProjectId());
-        }
-        ProjectExample projectExample = new ProjectExample();
-        projectExample.createCriteria().andIdIn(projectIds);
-        List<Project> projects = projectMapper.selectByExample(projectExample);
-        if (CollectionUtils.isEmpty(projects)) {
-            return result;
-        }
-        Map<Integer, Project> mapProject = Maps.newHashMap();
-        projects.forEach(t -> mapProject.put(t.getId(), t));
-        for (TechnicianProject technicianProject : technicianProjects) {
-            Project project = mapProject.get(technicianProject.getProjectId());
-            if (project != null) {
-                if (result.containsKey(technicianProject.getTechnicianId())) {
-                    List<Project> projectList = result.get(technicianProject.getTechnicianId());
-                    projectList.add(project);
-                } else {
-                    List<Project> projectList = Lists.newArrayList();
-                    projectList.add(project);
-                    result.put(technicianProject.getTechnicianId(), projectList);
-                }
-            }
-        }
-        return result;
-    }
 
     public List<String> listTechnicianPhotoById(Long technicianId) {
         List<String> result = Lists.newArrayList();
@@ -154,6 +100,12 @@ public class TechnicianQueryBiz {
             return Lists.newArrayList();
         else
             return result;
+    }
+
+    public List<Technician> listTechnicianByIds(List<Long> technicianIds){
+        TechnicianExample technicianExample = new TechnicianExample();
+        technicianExample.createCriteria().andIdIn(technicianIds);
+        return technicianMapper.selectByExample(technicianExample);
     }
 
 }

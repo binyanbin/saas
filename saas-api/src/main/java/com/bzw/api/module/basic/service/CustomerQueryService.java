@@ -87,8 +87,6 @@ public class CustomerQueryService {
         return result;
     }
 
-
-
     public List<RoomDTO> listRoomsByBranchId(Long branchId) {
         List<Room> rooms = roomQueryBiz.listRoomByBranchId(branchId);
         return transferRooms(rooms);
@@ -156,7 +154,7 @@ public class CustomerQueryService {
             result.setStateId(technician.getBizStatusId());
             List<String> photos = technicianQueryBiz.listTechnicianPhotoById(technicianId);
             result.setPhotos(photos);
-            List<Project> projects = technicianQueryBiz.listProjectByTechnicianId(technicianId);
+            List<Project> projects = projectQueryBiz.listProjectByTechnicianId(technicianId);
             List<String> spa = Lists.newArrayList();
             List<String> massage = Lists.newArrayList();
 
@@ -185,11 +183,13 @@ public class CustomerQueryService {
         result.setStateName(OrderState.parse(order.getBizStatusId()).getDesc());
         result.setBranchName(orderDetails.get(0).getBranchName());
         result.setPrice(order.getPrice());
+        result.setId(order.getId());
         List<OrderDetailDTO> detailDTOList = Lists.newArrayList();
         transferOrderDetailDTO(orderDetails, detailDTOList);
         result.setDetails(detailDTOList);
         return result;
     }
+
     public OrderDTO getOrderByRoomId(Long roomId) {
         Room room = roomQueryBiz.getRoom(roomId);
         if (room.getOrderId() != null && room.getOrderId() > 0L) {
@@ -199,9 +199,9 @@ public class CustomerQueryService {
         }
     }
 
-    public List<OrderDTO> listOrder(String openId) {
+    public List<OrderDTO> listOrderByUserId(Long userId) {
         List<OrderDTO> result = Lists.newArrayList();
-        List<Order> orders = orderQueryBiz.listOrder(openId);
+        List<Order> orders = orderQueryBiz.listOrderByUserId(userId);
         if (CollectionUtils.isEmpty(orders)) {
             return result;
         }
@@ -224,6 +224,7 @@ public class CustomerQueryService {
         });
         for (Order order : orders) {
             OrderDTO orderDTO = new OrderDTO();
+            orderDTO.setId(order.getId());
             orderDTO.setStateId(order.getBizStatusId());
             orderDTO.setStateName(OrderState.parse(order.getBizStatusId()).getDesc());
             orderDTO.setBranchName(orderDetails.get(0).getBranchName());

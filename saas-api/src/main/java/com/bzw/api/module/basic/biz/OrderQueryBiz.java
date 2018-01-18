@@ -31,16 +31,17 @@ public class OrderQueryBiz {
         return orderDetailMapper.selectByExample(orderDetailExample);
     }
 
-    public List<Order> listOrder(String openId){
+    public List<Order> listOrderByUserId(Long userId){
         OrderExample orderExample = new OrderExample();
-        orderExample.createCriteria().andWechatIdEqualTo(openId);
+        orderExample.createCriteria().andUserIdEqualTo(userId);
         return orderMapper.selectByExample(orderExample);
     }
 
-    public List<OrderDetail> listOrderDetail(List<Long> orderIds){
+    public List<OrderDetail> listOrderDetail(List<Long> detailIds){
         OrderDetailExample orderDetailExample = new OrderDetailExample();
-        orderDetailExample.createCriteria().andOrderIdIn(orderIds);
+        orderDetailExample.createCriteria().andOrderIdIn(detailIds);
         return orderDetailMapper.selectByExample(orderDetailExample);
+
     }
 
 }
