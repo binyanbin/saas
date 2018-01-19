@@ -2,6 +2,9 @@ package com.bzw.api.module.basic.dto;
 
 import java.math.BigDecimal;
 
+/**
+ * @author yanbin
+ */
 public class ProjectDTO {
     private String name;
     private Integer id;
@@ -56,5 +59,17 @@ public class ProjectDTO {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    @Override
+    public String toString() {
+        return "ProjectDTO{" +
+                "name='" + name + '\'' +
+                ", id=" + id +
+                ", typeName='" + typeName + '\'' +
+                ", typeId=" + typeId +
+                ", price=" + price +
+                ", duration=" + duration +
+                '}';
     }
 }

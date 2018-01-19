@@ -11,7 +11,7 @@ import com.bzw.api.module.platform.model.User;
 import com.bzw.common.enums.Status;
 import com.bzw.common.sequence.SeqType;
 import com.bzw.common.sequence.SequenceService;
-import com.bzw.common.utils.SHA256;
+import com.bzw.common.utils.Sha256;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +20,9 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * @author yanbin
+ */
 @Service
 public class InitService {
 
@@ -92,10 +95,11 @@ public class InitService {
             project.setStatusId(Status.Valid.getValue());
             project.setPrice(new BigDecimal(prices[i]));
             project.setBranchName(branch.getName());
-            if (i<=1)
+            if (i<=1) {
                 project.setType(ProjectType.spa.getValue());
-            else
+            } else {
                 project.setType(ProjectType.footMassage.getValue());
+            }
             projects.add(project);
             projectMapper.insert(project);
         }
@@ -116,7 +120,7 @@ public class InitService {
             User user = new User();
             user.setId(userIds.get(i));
             user.setCode(mobiles[i]);
-            user.setPassword(SHA256.encrypt("888888"));
+            user.setPassword(Sha256.encrypt("888888"));
             user.setCreatedDate(now);
             user.setCreatedId(0L);
             user.setModifiedDate(now);
@@ -206,10 +210,11 @@ public class InitService {
             room.setNumber(roomNum[i]);
             room.setStatusId(Status.Valid.getValue());
             room.setBranchName(branch.getName());
-            if (i <= 3)
+            if (i <= 3) {
                 room.setType(ProjectType.footMassage.getValue());
-            else
+            } else {
                 room.setType(ProjectType.spa.getValue());
+            }
             room.setVersionId(0);
             roomMapper.insert(room);
         }

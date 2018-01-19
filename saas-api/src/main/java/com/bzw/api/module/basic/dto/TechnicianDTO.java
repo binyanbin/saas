@@ -1,5 +1,8 @@
 package com.bzw.api.module.basic.dto;
 
+/**
+ * @author yanbin
+ */
 public class TechnicianDTO {
 
     private String name;
@@ -91,5 +94,21 @@ public class TechnicianDTO {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return "TechnicianDTO{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                ", description='" + description + '\'' +
+                ", phone='" + phone + '\'' +
+                ", stateName='" + stateName + '\'' +
+                ", stateId=" + stateId +
+                ", id=" + id +
+                ", jobNumber='" + jobNumber + '\'' +
+                ", praise=" + praise +
+                ", orderCount=" + orderCount +
+                '}';
     }
 }

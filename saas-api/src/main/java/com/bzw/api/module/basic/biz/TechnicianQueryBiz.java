@@ -1,6 +1,5 @@
 package com.bzw.api.module.basic.biz;
 
-import com.bzw.api.module.basic.dao.ProjectMapper;
 import com.bzw.api.module.basic.dao.TechnicianMapper;
 import com.bzw.api.module.basic.dao.TechnicianPhotoMapper;
 import com.bzw.api.module.basic.dao.TechnicianProjectMapper;
@@ -16,6 +15,9 @@ import org.springframework.util.CollectionUtils;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author yanbin
+ */
 @Service
 public class TechnicianQueryBiz {
 
@@ -44,14 +46,16 @@ public class TechnicianQueryBiz {
         TechnicianPhotoExample example = new TechnicianPhotoExample();
         example.createCriteria().andTechnicianIdIn(technicianIds);
         List<TechnicianPhoto> technicianPhotos = technicianPhotoMapper.selectByExample(example);
-        if (CollectionUtils.isEmpty(technicianPhotos))
+        if (CollectionUtils.isEmpty(technicianPhotos)) {
             return result;
+        }
         for (TechnicianPhoto technicianPhoto : technicianPhotos) {
             if (StringUtils.isNotBlank(technicianPhoto.getUrl())) {
                 if (result.containsKey(technicianPhoto.getTechnicianId())) {
                     List<String> photos = result.get(technicianPhoto.getTechnicianId());
-                    if (!photos.contains(technicianPhoto.getUrl()))
+                    if (!photos.contains(technicianPhoto.getUrl())) {
                         photos.add(technicianPhoto.getUrl());
+                    }
                 } else {
                     List<String> photos = Lists.newArrayList();
                     photos.add(technicianPhoto.getUrl());
@@ -67,14 +71,15 @@ public class TechnicianQueryBiz {
     }
 
     public List<Technician> listTechnicianByBranchId(Long branchId, int sort) {
-
+        String orderByPraise = " praise desc";
+        String orderByCount = " order_count desc";
+        int praise = 1, order = 2;
         TechnicianExample technicianExample = new TechnicianExample();
         technicianExample.createCriteria().andBranchIdEqualTo(branchId).andStatusIdEqualTo(Status.Valid.getValue());
-        if (sort == 1) {
-            technicianExample.setOrderByClause(" praise desc");
-        }
-        else if (sort == 2){
-            technicianExample.setOrderByClause(" order_count desc");
+        if (sort == praise) {
+            technicianExample.setOrderByClause(orderByPraise);
+        } else if (sort == order) {
+            technicianExample.setOrderByClause(orderByCount);
         }
         return technicianMapper.selectByExample(technicianExample);
     }
@@ -83,8 +88,9 @@ public class TechnicianQueryBiz {
         TechnicianProjectExample example = new TechnicianProjectExample();
         example.createCriteria().andProjectIdEqualTo(projectId);
         List<TechnicianProject> technicianProjects = technicianProjectMapper.selectByExample(example);
-        if (CollectionUtils.isEmpty(technicianProjects))
+        if (CollectionUtils.isEmpty(technicianProjects)) {
             return Lists.newArrayList();
+        }
         List<Long> technicianIds = Lists.newArrayList();
         Long branchId = 0L;
         for (TechnicianProject technicianProject : technicianProjects) {
@@ -96,13 +102,14 @@ public class TechnicianQueryBiz {
         TechnicianExample technicianExample = new TechnicianExample();
         technicianExample.createCriteria().andIdIn(technicianIds).andStatusIdEqualTo(Status.Valid.getValue()).andBranchIdEqualTo(branchId);
         List<Technician> result = technicianMapper.selectByExample(technicianExample);
-        if (CollectionUtils.isEmpty(result))
+        if (CollectionUtils.isEmpty(result)) {
             return Lists.newArrayList();
-        else
+        } else {
             return result;
+        }
     }
 
-    public List<Technician> listTechnicianByIds(List<Long> technicianIds){
+    public List<Technician> listTechnicianByIds(List<Long> technicianIds) {
         TechnicianExample technicianExample = new TechnicianExample();
         technicianExample.createCriteria().andIdIn(technicianIds);
         return technicianMapper.selectByExample(technicianExample);

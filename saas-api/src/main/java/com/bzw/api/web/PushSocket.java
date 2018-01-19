@@ -8,8 +8,11 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArraySet;
-
+/**
+ * @author yanbin
+ */
 @ServerEndpoint("/websocket")
 @Component
 public class PushSocket {
@@ -60,4 +63,20 @@ public class PushSocket {
         PushSocket.onlineCount--;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PushSocket that = (PushSocket) o;
+        return Objects.equals(session, that.session);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(session);
+    }
 }

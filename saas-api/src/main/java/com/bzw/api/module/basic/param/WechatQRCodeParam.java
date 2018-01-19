@@ -1,6 +1,6 @@
 package com.bzw.api.module.basic.param;
 
-public class WechatQRCodeParam {
+public class WechatQrCodeParam {
     private String scene;
     private String page;
 

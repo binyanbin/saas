@@ -9,6 +9,9 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+/**
+ * @author yanbin
+ */
 @Configuration
 public class WebConfig extends WebMvcConfigurerAdapter {
     private AccessHandler accessHandler;

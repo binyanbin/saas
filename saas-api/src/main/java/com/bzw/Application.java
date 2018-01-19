@@ -6,6 +6,9 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+/**
+ * @author yanbin
+ */
 @SpringBootApplication(scanBasePackages = "com.bzw")
 @MapperScan(basePackages = "com.bzw.api.**.dao" )
 @EnableAutoConfiguration

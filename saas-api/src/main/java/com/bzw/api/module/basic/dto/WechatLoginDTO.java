@@ -1,5 +1,9 @@
 package com.bzw.api.module.basic.dto;
 
+/**
+ * @author yanbin
+ */
+@SuppressWarnings("AlibabaLowerCamelCaseVariableNaming")
 public class WechatLoginDTO {
     private String openid;
     private String session_key;
@@ -27,5 +31,14 @@ public class WechatLoginDTO {
 
     public void setUnionid(String unionid) {
         this.unionid = unionid;
+    }
+
+    @Override
+    public String toString() {
+        return "WechatLoginDTO{" +
+                "openid='" + openid + '\'' +
+                ", session_key='" + session_key + '\'' +
+                ", unionid='" + unionid + '\'' +
+                '}';
     }
 }

@@ -2,7 +2,7 @@ package com.bzw.api.module.basic.service;
 
 import com.bzw.api.module.basic.dto.WechatAccesTokenDTO;
 import com.bzw.api.module.basic.dto.WechatLoginDTO;
-import com.bzw.api.module.basic.param.WechatQRCodeParam;
+import com.bzw.api.module.basic.param.WechatQrCodeParam;
 import com.bzw.common.cache.RedisClient;
 import com.bzw.common.utils.HttpClient;
 import com.google.gson.Gson;
@@ -10,6 +10,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * @author yanbin
+ */
 @Service
 public class WechatService {
 
@@ -50,10 +53,10 @@ public class WechatService {
 
     public byte[] getGrCode(String page, String accessToken, String scene) {
         String url = String.format("http://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=%s", accessToken);
-        WechatQRCodeParam param = new WechatQRCodeParam();
+        WechatQrCodeParam param = new WechatQrCodeParam();
         param.setPage(page);
         param.setScene(scene);
-        String paramContent = gson.toJson(param, WechatQRCodeParam.class);
+        String paramContent = gson.toJson(param, WechatQrCodeParam.class);
         return HttpClient.postJson(url, paramContent);
     }
 

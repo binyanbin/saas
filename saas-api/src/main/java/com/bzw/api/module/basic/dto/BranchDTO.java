@@ -1,5 +1,8 @@
 package com.bzw.api.module.basic.dto;
 
+/**
+ * @author yanbin
+ */
 public class BranchDTO {
     private Long id;
     private String name;
@@ -36,5 +39,15 @@ public class BranchDTO {
 
     public void setTelephone(String telephone) {
         this.telephone = telephone;
+    }
+
+    @Override
+    public String toString() {
+        return "BranchDTO{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", address='" + address + '\'' +
+                ", telephone='" + telephone + '\'' +
+                '}';
     }
 }

@@ -19,6 +19,9 @@ import org.springframework.util.CollectionUtils;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author yanbin
+ */
 @Service
 public class CustomerQueryService {
 
@@ -50,15 +53,15 @@ public class CustomerQueryService {
 
     public List<ProjectDTO> listProjectsByBranchId(Long branchId) {
         List<Project> projectList = projectQueryBiz.listProjectByBranchId(branchId);
-        return transferProjects(projectList);
+        return mapToProjectDto(projectList);
     }
 
     public List<ProjectDTO> listProjectsByRoomId(Long roomId) {
         List<Project> projectList = projectQueryBiz.listProjectsByRoomId(roomId);
-        return transferProjects(projectList);
+        return mapToProjectDto(projectList);
     }
 
-    private List<ProjectDTO> transferProjects(List<Project> projectList) {
+    private List<ProjectDTO> mapToProjectDto(List<Project> projectList) {
         List<ProjectDTO> result = Lists.newArrayList();
         for (Project project : projectList) {
             ProjectDTO projectDTO = new ProjectDTO();
@@ -74,56 +77,51 @@ public class CustomerQueryService {
     }
 
     public RoomDTO getRoom(Long roomId) {
-        RoomDTO result = new RoomDTO();
         Room room = roomQueryBiz.getRoom(roomId);
-        result.setId(room.getId());
-        result.setName(room.getNumber());
-        result.setStateName(RoomState.parse(room.getStatusId()).getDesc());
-        result.setStateId(room.getStatusId());
-        result.setHaveRestRoom(room.getHaveRestroom() == 1);
-        result.setTypeId(room.getType());
-        result.setTypeName(ProjectType.parse(room.getType()).getDesc());
-        result.setBedNumber(room.getBedNumber());
-        return result;
+        return mapToRoomDto(room);
     }
 
     public List<RoomDTO> listRoomsByBranchId(Long branchId) {
         List<Room> rooms = roomQueryBiz.listRoomByBranchId(branchId);
-        return transferRooms(rooms);
+        return mapToRoomDTOs(rooms);
     }
 
     public List<RoomDTO> listRoomByProjectId(Integer projectId) {
         List<Room> rooms = roomQueryBiz.listRoomByProjectId(projectId);
-        return transferRooms(rooms);
+        return mapToRoomDTOs(rooms);
     }
 
-    private List<RoomDTO> transferRooms(List<Room> rooms) {
+    private List<RoomDTO> mapToRoomDTOs(List<Room> rooms) {
         List<RoomDTO> result = Lists.newArrayList();
         for (Room room : rooms) {
-            RoomDTO roomDTO = new RoomDTO();
-            roomDTO.setId(room.getId());
-            roomDTO.setName(room.getNumber());
-            roomDTO.setStateName(RoomState.parse(room.getStatusId()).getDesc());
-            roomDTO.setStateId(room.getStatusId());
-            roomDTO.setHaveRestRoom(room.getHaveRestroom() == 1);
-            roomDTO.setTypeId(room.getType());
-            roomDTO.setTypeName(ProjectType.parse(room.getType()).getDesc());
-            result.add(roomDTO);
+            result.add(mapToRoomDto(room));
         }
         return result;
     }
 
+    private RoomDTO mapToRoomDto(Room room){
+        RoomDTO roomDTO = new RoomDTO();
+        roomDTO.setId(room.getId());
+        roomDTO.setName(room.getNumber());
+        roomDTO.setStateName(RoomState.parse(room.getStatusId()).getDesc());
+        roomDTO.setStateId(room.getStatusId());
+        roomDTO.setHaveRestRoom(room.getHaveRestroom() == 1);
+        roomDTO.setTypeId(room.getType());
+        roomDTO.setTypeName(ProjectType.parse(room.getType()).getDesc());
+        return roomDTO;
+    }
+
     public List<TechnicianDTO> listTechnicianByProjectId(Integer projectId) {
         List<Technician> technicians = technicianQueryBiz.listTechnicianByProjectId(projectId);
-        return transferTechnicians(technicians);
+        return mapToTechnicianDto(technicians);
     }
 
     public List<TechnicianDTO> listTechnicianByBranchId(Long branchId, int sort) {
         List<Technician> technicians = technicianQueryBiz.listTechnicianByBranchId(branchId, sort);
-        return transferTechnicians(technicians);
+        return mapToTechnicianDto(technicians);
     }
 
-    private List<TechnicianDTO> transferTechnicians(List<Technician> technicians) {
+    private List<TechnicianDTO> mapToTechnicianDto(List<Technician> technicians) {
         List<TechnicianDTO> result = Lists.newArrayList();
         for (Technician technician : technicians) {
             TechnicianDTO technicianDTO = new TechnicianDTO();
@@ -176,8 +174,9 @@ public class CustomerQueryService {
     public OrderDTO getOrder(Long orderId) {
         OrderDTO result = new OrderDTO();
         Order order = orderQueryBiz.getOrder(orderId);
-        if (order == null)
+        if (order == null) {
             return null;
+        }
         List<OrderDetail> orderDetails = orderQueryBiz.listOrderDetail(orderId);
         result.setStateId(order.getBizStatusId());
         result.setStateName(OrderState.parse(order.getBizStatusId()).getDesc());
@@ -185,7 +184,7 @@ public class CustomerQueryService {
         result.setPrice(order.getPrice());
         result.setId(order.getId());
         List<OrderDetailDTO> detailDTOList = Lists.newArrayList();
-        transferOrderDetailDTO(orderDetails, detailDTOList);
+        mapToOrderDetailDto(orderDetails, detailDTOList);
         result.setDetails(detailDTOList);
         return result;
     }
@@ -231,14 +230,14 @@ public class CustomerQueryService {
             orderDTO.setPrice(order.getPrice());
             List<OrderDetail> orderDetailList = mapOrderDetail.get(order.getId());
             List<OrderDetailDTO> detailDTOList = Lists.newArrayList();
-            transferOrderDetailDTO(orderDetailList, detailDTOList);
+            mapToOrderDetailDto(orderDetailList, detailDTOList);
             orderDTO.setDetails(detailDTOList);
             result.add(orderDTO);
         }
         return result;
     }
 
-    private void transferOrderDetailDTO(List<OrderDetail> orderDetails, List<OrderDetailDTO> detailDTOList) {
+    private void mapToOrderDetailDto(List<OrderDetail> orderDetails, List<OrderDetailDTO> detailDTOList) {
         for (OrderDetail orderDetail : orderDetails) {
             OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
             orderDetailDTO.setBookTime(orderDetail.getBookTime());

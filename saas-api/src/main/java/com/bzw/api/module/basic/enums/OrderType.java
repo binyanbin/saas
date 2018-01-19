@@ -1,6 +1,13 @@
 package com.bzw.api.module.basic.enums;
 
+/**
+ * @author yanbin
+ */
+
 public enum OrderType {
+    /**
+     * 订单类型
+     */
     CustomerReservation(1, "客户预定"),
     BookForCustomers(2, "帮客户预定"),
     ;

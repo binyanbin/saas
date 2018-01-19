@@ -11,7 +11,9 @@ import com.bzw.common.web.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
-
+/**
+ * @author yanbin
+ */
 @RestController
 @RequestMapping("user")
 public class UserController extends BaseController {
@@ -33,7 +35,7 @@ public class UserController extends BaseController {
 
     @RequestMapping(value = "/login", method = {RequestMethod.OPTIONS, RequestMethod.POST})
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
-    public Object Login(@RequestBody LoginParam loginParam) {
+    public Object login(@RequestBody LoginParam loginParam) {
         return wrapperJsonView(customerEventService.login(loginParam.getCode(), loginParam.getPassword()));
     }
 
@@ -47,8 +49,9 @@ public class UserController extends BaseController {
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
     public Object codeLogin(@PathVariable String jscode) {
         String openId = wechatService.getOpenId(appid, secret, jscode);
-        if (null == openId)
+        if (null == openId) {
             throw new UserLoginFailException();
+        }
         return wrapperJsonView(customerEventService.openIdLogin(openId));
     }
 

@@ -1,12 +1,15 @@
 package com.bzw.api.module.basic.dto;
 
+/**
+ * @author yanbin
+ */
 public class RoomDTO {
 
     private Long id;
     private String name;
     private String stateName;
     private Integer stateId;
-    private boolean haveRestRoom;
+    private Boolean haveRestRoom;
     private Integer typeId;
     private String typeName;
     private Integer bedNumber;
@@ -51,11 +54,11 @@ public class RoomDTO {
         this.stateId = stateId;
     }
 
-    public boolean isHaveRestRoom() {
+    public Boolean isHaveRestRoom() {
         return haveRestRoom;
     }
 
-    public void setHaveRestRoom(boolean haveRestRoom) {
+    public void setHaveRestRoom(Boolean haveRestRoom) {
         this.haveRestRoom = haveRestRoom;
     }
 
@@ -73,5 +76,19 @@ public class RoomDTO {
 
     public void setTypeName(String typeName) {
         this.typeName = typeName;
+    }
+
+    @Override
+    public String toString() {
+        return "RoomDTO{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", stateName='" + stateName + '\'' +
+                ", stateId=" + stateId +
+                ", haveRestRoom=" + haveRestRoom +
+                ", typeId=" + typeId +
+                ", typeName='" + typeName + '\'' +
+                ", bedNumber=" + bedNumber +
+                '}';
     }
 }

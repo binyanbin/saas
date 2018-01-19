@@ -1,7 +1,13 @@
 package com.bzw.api.module.basic.enums;
 
-public enum RoomState {
+/**
+ * @author yanbin
+ */
 
+public enum RoomState {
+    /**
+     * 房间状态
+     */
     free(1, "空闲"),
     booked(2, "预定"),
     using(3, "使用中"),

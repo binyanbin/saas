@@ -1,5 +1,8 @@
 package com.bzw.api.module.basic.param;
 
+/**
+ * @author yanbin
+ */
 public class LoginParam {
     private String code;
     private String password;

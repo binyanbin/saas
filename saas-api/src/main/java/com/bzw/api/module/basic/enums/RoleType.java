@@ -1,6 +1,13 @@
 package com.bzw.api.module.basic.enums;
 
+/**
+ * @author yanbin
+ */
+
 public enum RoleType {
+    /**
+     * 系统角色
+     */
     reception(1, "收银"),
     service(2, "接待"),
     technician(3,"技师"),

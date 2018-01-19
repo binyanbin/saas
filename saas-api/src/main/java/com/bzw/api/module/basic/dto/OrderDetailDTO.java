@@ -3,6 +3,9 @@ package com.bzw.api.module.basic.dto;
 import java.math.BigDecimal;
 import java.util.Date;
 
+/**
+ * @author yanbin
+ */
 public class OrderDetailDTO {
     private Long roomId;
     private String roomName;
@@ -75,5 +78,19 @@ public class OrderDetailDTO {
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    @Override
+    public String toString() {
+        return "OrderDetailDTO{" +
+                "roomId=" + roomId +
+                ", roomName='" + roomName + '\'' +
+                ", bookTime=" + bookTime +
+                ", technicianId=" + technicianId +
+                ", technicianName='" + technicianName + '\'' +
+                ", price=" + price +
+                ", projectId=" + projectId +
+                ", projectName='" + projectName + '\'' +
+                '}';
     }
 }

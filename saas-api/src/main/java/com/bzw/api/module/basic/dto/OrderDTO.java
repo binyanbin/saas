@@ -3,6 +3,9 @@ package com.bzw.api.module.basic.dto;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * @author yanbin
+ */
 public class OrderDTO {
     private String branchName;
     private BigDecimal price;
@@ -57,5 +60,17 @@ public class OrderDTO {
 
     public void setStateName(String stateName) {
         this.stateName = stateName;
+    }
+
+    @Override
+    public String toString() {
+        return "OrderDTO{" +
+                "branchName='" + branchName + '\'' +
+                ", price=" + price +
+                ", stateId=" + stateId +
+                ", stateName='" + stateName + '\'' +
+                ", id=" + id +
+                ", details=" + details +
+                '}';
     }
 }

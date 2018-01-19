@@ -1,6 +1,13 @@
 package com.bzw.api.module.basic.enums;
 
+/**
+ * @author yanbin
+ */
+
 public enum OrderState {
+    /**
+     * 订单状态
+     */
     non_payment(1, "未支付"),
     paid(2, "已支付"),
     ;

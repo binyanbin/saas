@@ -1,6 +1,13 @@
 package com.bzw.api.module.basic.enums;
 
+/**
+ * @author yanbin
+ */
+
 public enum TechnicianState {
+    /**
+     * 技师状态
+     */
     free(1, "空闲"),
     booked(2, "预定"),
     serving(3,"服务中"),

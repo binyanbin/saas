@@ -1,6 +1,13 @@
 package com.bzw.api.module.basic.enums;
 
+/**
+ * @author yanbin
+ */
+
 public enum  RecordChangeType {
+    /**
+     * 业务记录类型
+     */
     room(1, "biz_room"),
     order(2, "biz_order"),
     technician(3,"biz_technician"),

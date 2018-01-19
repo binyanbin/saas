@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * @author yanbin
+ */
 @Service
 public class RoomQueryBiz {
 
@@ -22,8 +25,9 @@ public class RoomQueryBiz {
 
     public Branch getBranchByRoomId(Long roomId) {
         Room room = roomMapper.selectByPrimaryKey(roomId);
-        if (room == null)
+        if (room == null) {
             return null;
+        }
         return branchMapper.selectByPrimaryKey(room.getBranchId());
     }
 

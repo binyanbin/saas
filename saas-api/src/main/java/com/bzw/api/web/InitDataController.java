@@ -6,7 +6,9 @@ import com.bzw.common.web.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+/**
+ * @author yanbin
+ */
 @RestController
 @RequestMapping("data")
 public class InitDataController extends BaseController {

@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
-
+/**
+ * @author yanbin
+ */
 @RestController
 @RequestMapping("rooms")
 public class RoomController extends BaseController {
@@ -67,7 +69,7 @@ public class RoomController extends BaseController {
 
     @RequestMapping(value = "{roomId}/qrcode", method = {RequestMethod.GET})
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
-    public void QRcode(@PathVariable Long roomId, HttpServletResponse response) throws IOException {
+    public void qrCode(@PathVariable Long roomId, HttpServletResponse response) throws IOException {
         String accessToken = wechatService.getAccessToken(appid, secret);
         response.setContentType("image/png");
         OutputStream stream = response.getOutputStream();

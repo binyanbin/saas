@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+/**
+ * @author yanbin
+ */
 @RestController
 @RequestMapping("order")
 public class OrderController extends BaseController {
@@ -24,10 +26,11 @@ public class OrderController extends BaseController {
     @ApiMethodAttribute(nonSignatureValidation = true)
     public Object pay(@RequestBody List<OrderParam> orderParam) {
         Long id = customerEventService.addOrder(orderParam);
-        if (id != null)
+        if (id != null) {
             return wrapperJsonView(customerQueryService.getOrder(id));
-        else
+        } else {
             return wrapperJsonView(null);
+        }
     }
 
     @RequestMapping(value = "/{id}")
@@ -40,10 +43,11 @@ public class OrderController extends BaseController {
     @ApiMethodAttribute(nonSignatureValidation = true)
     public Object modify(@PathVariable Long id, @RequestBody List<OrderParam> orderParam) {
         Long orderId = customerEventService.modifyOrder(id, orderParam);
-        if (orderId != null)
+        if (orderId != null) {
             return wrapperJsonView(customerQueryService.getOrder(orderId));
-        else
+        } else {
             return wrapperJsonView(null);
+        }
     }
 
 

@@ -4,6 +4,9 @@ import com.google.common.collect.Lists;
 
 import java.util.List;
 
+/**
+ * @author yanbin
+ */
 public class TechnicianDetailDTO extends TechnicianDTO {
     private List<String> spa;
     private List<String> massage;
@@ -47,5 +50,15 @@ public class TechnicianDetailDTO extends TechnicianDTO {
 
     public void setPhotos(List<String> photos) {
         this.photos = photos;
+    }
+
+    @Override
+    public String toString() {
+        return "TechnicianDetailDTO{" +
+                "spa=" + spa +
+                ", massage=" + massage +
+                ", tags=" + tags +
+                ", photos=" + photos +
+                '}';
     }
 }

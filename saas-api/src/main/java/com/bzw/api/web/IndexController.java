@@ -4,7 +4,9 @@ import com.bzw.common.content.ApiMethodAttribute;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+/**
+ * @author yanbin
+ */
 @RestController
 public class IndexController {
 
@@ -16,7 +18,7 @@ public class IndexController {
 
     @RequestMapping("/")
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
-    public Object Index() {
+    public Object index() {
         return title + " verison:" + version;
     }
 }

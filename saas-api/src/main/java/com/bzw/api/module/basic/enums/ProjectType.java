@@ -1,6 +1,13 @@
 package com.bzw.api.module.basic.enums;
 
+/**
+ * @author yanbin
+ */
+
 public enum ProjectType {
+    /**
+     * 项目类型
+     */
     spa(1, "spa"),
     footMassage(2, "足浴"),
     ;
