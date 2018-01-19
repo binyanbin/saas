@@ -1,9 +1,14 @@
 package com.bzw.common.sequence;
 
 /**
- * Created by yanbin on 2017/7/8.
+ *
+ * @author yanbin
+ * @date 2017/7/8
  */
 public enum SeqType {
+    /**
+     * 表id序列
+     */
     User("pl_user", "userMapper"),
     branch("biz_branch","branchMapper"),
     employee("biz_employee","employeeMapper"),

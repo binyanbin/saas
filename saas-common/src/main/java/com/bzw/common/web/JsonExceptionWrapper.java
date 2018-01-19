@@ -13,7 +13,9 @@ import java.io.IOException;
 import java.util.Arrays;
 
 /**
- * Created by yanbin on 2017/7/5.
+ *
+ * @author yanbin
+ * @date 2017/7/5
  */
 public class JsonExceptionWrapper {
 

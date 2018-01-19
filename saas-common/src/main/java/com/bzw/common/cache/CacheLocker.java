@@ -13,7 +13,9 @@ import java.util.concurrent.TimeUnit;
 import static java.lang.System.currentTimeMillis;
 
 /**
- * Created by yanbin on 2017/1/10.
+ *
+ * @author yanbin
+ * @date 2017/1/10
  */
 @Component
 public class CacheLocker implements ICacheLock{
@@ -21,12 +23,13 @@ public class CacheLocker implements ICacheLock{
     /**
      * 最长时间锁为5分钟
      */
-    private final static int maxExpireTime = (int) CacheKeyPrefix.Lock.getTimeout();
+    private final static int MAX_EXPIRE_TIME = (int) CacheKeyPrefix.Lock.getTimeout();
 
     /**
      * 系统时间偏移量5秒，服务器间的系统时间差不可以超过5秒,避免由于时间差造成错误的解锁
      */
-    private final static int offsetTime = 5;
+    private final static int OFFSET_TIME = 5;
+    private final static int SECOND = 1000;
 
     private StringRedisTemplate springRedisTemplate;
 
@@ -44,23 +47,24 @@ public class CacheLocker implements ICacheLock{
      * @return true 成功 false失败
      * @throws Exception
      */
+    @Override
     public boolean lock(String key, int waitTime, int expire) throws InterruptedException {
         long start = currentTimeMillis();
-        String lock_key = CacheKeyPrefix.Lock.getKey() + key;
+        String lockKey = CacheKeyPrefix.Lock.getKey() + key;
         do {
-            if (!springRedisTemplate.hasKey(lock_key)) {
+            if (!springRedisTemplate.hasKey(lockKey)) {
                 Long currentTime = System.currentTimeMillis();
-                springRedisTemplate.opsForValue().set(lock_key, currentTime.toString(),
-                        (expire > maxExpireTime) ? maxExpireTime : expire, TimeUnit.SECONDS);
+                springRedisTemplate.opsForValue().set(lockKey, currentTime.toString(),
+                        (expire > MAX_EXPIRE_TIME) ? MAX_EXPIRE_TIME : expire, TimeUnit.SECONDS);
                 return true;
             } else { // 存在锁,并对死锁进行修复
                 // 上次锁时间
-                long lastLockTime = Long.parseLong(springRedisTemplate.opsForValue().get(lock_key));
+                long lastLockTime = Long.parseLong(springRedisTemplate.opsForValue().get(lockKey));
                 // 明确死锁,，再次设定一个合理的解锁时间让系统正常解锁
-                if (System.currentTimeMillis() - lastLockTime > (expire + offsetTime) * 1000) {
+                if (System.currentTimeMillis() - lastLockTime > (expire + OFFSET_TIME) * SECOND) {
                     // 原子操作，只需要一次,【任然会发生小概率事件，多个服务同时发现死锁同时执行此行代码(并发),
                     // 为什么设置解锁时间为expire（而不是更小的时间），防止在解锁发送错乱造成新锁解锁】
-                    springRedisTemplate.opsForValue().set(lock_key, "999999999", expire);
+                    springRedisTemplate.opsForValue().set(lockKey, "999999999", expire);
                 }
             }
             if (waitTime > 0) {
@@ -78,9 +82,10 @@ public class CacheLocker implements ICacheLock{
      * @return
      * @throws Exception
      */
+    @Override
     public boolean unlock(String key) {
-        String lock_key = CacheKeyPrefix.Lock.getKey() + key;
-        springRedisTemplate.delete(lock_key);
+        String lockKey = CacheKeyPrefix.Lock.getKey() + key;
+        springRedisTemplate.delete(lockKey);
         return true;
     }
 }

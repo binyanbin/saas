@@ -7,7 +7,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 /**
- * Created by yanbin on 2017/7/1.
+ *
+ * @author yanbin
+ * @date 2017/7/1
  */
 public class WebContext {
     private WebSession webSession;

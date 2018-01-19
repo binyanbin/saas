@@ -1,16 +1,19 @@
 package com.bzw.common.content;
 
 /**
- * Created by yanbin on 2017/7/1.
+ *
+ * @author yanbin
+ * @date 2017/7/1
  */
 public class ThreadWebContextHolder {
     private static final ThreadLocal<WebContext> THREAD_LOCAL = new ThreadLocal<>();
 
     public static WebContext getContext() {
-        if (THREAD_LOCAL.get() != null)
+        if (THREAD_LOCAL.get() != null) {
             return THREAD_LOCAL.get();
-        else
+        } else {
             return null;
+        }
     }
 
     public static void setContext(WebContext value) {

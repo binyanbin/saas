@@ -4,7 +4,9 @@ import com.bzw.common.exception.ApplicationErrorCode;
 import com.bzw.common.exception.ApplicationException;
 
 /**
- * Created by yanbin on 2017/7/1.
+ *
+ * @author yanbin
+ * @date 2017/7/1
  */
 public class InvalidAccessTokenException extends ApplicationException {
 

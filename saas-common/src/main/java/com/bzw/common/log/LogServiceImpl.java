@@ -1,6 +1,7 @@
 package com.bzw.common.log;
 
 import com.bzw.common.content.WebSession;
+import com.bzw.common.enums.Constants;
 import com.bzw.common.log.model.Daily;
 import com.bzw.common.log.model.ExceptionInfo;
 import com.bzw.common.log.model.TimeoutInfo;
@@ -18,35 +19,37 @@ import java.util.Date;
 
 
 /**
- * Created by yanbin on 2017/7/7.
+ * @author yanbin
+ * @date 2017/7/7
  */
 @Component
-public class LogService implements ILogService {
+public class LogServiceImpl implements ILogService {
 
-    private  MongoTemplate  mongoTemplate;
+    private MongoTemplate mongoTemplate;
 
     @Autowired
-    public LogService(MongoTemplate mongoTemplate){
+    public LogServiceImpl(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
     }
 
+    @Override
     public void insertExcept(JsonExceptionWrapper exception) {
         ExceptionInfo data = new ExceptionInfo();
         data.setCode(exception.getCode());
         data.setMsg(exception.getMsg());
         data.setException(exception.getStackTrace());
-        if (MDC.get("profile") != null) {
-            data.setProfile(MDC.get("profile"));
+        if (MDC.get(Constants.PROFILE) != null) {
+            data.setProfile(MDC.get(Constants.PROFILE));
         }
         WebSession session = WebUtils.Session.get();
-        if (MDC.get("ip") != null) {
-            data.setIp(MDC.get("ip"));
+        if (MDC.get(Constants.IP) != null) {
+            data.setIp(MDC.get(Constants.IP));
         }
-        if (MDC.get("url") != null) {
-            data.setUrl(MDC.get("url"));
+        if (MDC.get(Constants.URL) != null) {
+            data.setUrl(MDC.get(Constants.URL));
         }
-        if (MDC.get("url_body") != null) {
-            data.setBody(MDC.get("url_body"));
+        if (MDC.get(Constants.URL_BODY) != null) {
+            data.setBody(MDC.get(Constants.URL_BODY));
         }
         if (session != null) {
             if (session.getUserId() != null) {
@@ -63,12 +66,13 @@ public class LogService implements ILogService {
         format = new SimpleDateFormat("yyyy-MM-dd");
         String dayString = format.format(tempDate);
         data.setDay(dayString);
-        if (!StringUtils.isBlank(MDC.get("sessionId"))) {
-            data.setSessionId(MDC.get("sessionId"));
+        if (!StringUtils.isBlank(MDC.get(Constants.SESSION_ID))) {
+            data.setSessionId(MDC.get(Constants.SESSION_ID));
         }
         mongoTemplate.insert(data);
     }
 
+    @Override
     public void insertVisit(TimeoutInfo data) {
 
         Date tempDate = new Date();
@@ -78,8 +82,8 @@ public class LogService implements ILogService {
         format = new SimpleDateFormat("yyyy-MM-dd");
         String dayString = format.format(tempDate);
         data.setDay(dayString);
-        if (!StringUtils.isBlank(MDC.get("sessionId"))) {
-            data.setSessionId(MDC.get("sessionId"));
+        if (!StringUtils.isBlank(MDC.get(Constants.SESSION_ID))) {
+            data.setSessionId(MDC.get(Constants.SESSION_ID));
         }
         try {
             mongoTemplate.insert(data);
@@ -88,6 +92,7 @@ public class LogService implements ILogService {
         }
     }
 
+    @Override
     public void insertDaily() {
 
         Daily data = new Daily();
@@ -98,18 +103,22 @@ public class LogService implements ILogService {
         format = new SimpleDateFormat("yyyy-MM-dd");
         String dayString = format.format(tempDate);
         data.setDay(dayString);
-        if (MDC.get("ip") != null) {
-            data.setIp(MDC.get("ip"));
+        if (MDC.get(Constants.IP) != null) {
+            data.setIp(MDC.get(Constants.IP));
         }
-        if (MDC.get("profile") != null)
-            data.setUserAgent(MDC.get("profile"));
-        if (MDC.get("method") != null)
-            data.setMethod(MDC.get("method"));
-        if (MDC.get("url") != null)
-            data.setUrl(MDC.get("url"));
-        if (MDC.get("userId") != null)
-            data.setUserId(MDC.get("userId"));
-        if (!StringUtils.isBlank(MDC.get("sessionId"))) {
+        if (MDC.get(Constants.PROFILE) != null) {
+            data.setUserAgent(MDC.get(Constants.PROFILE));
+        }
+        if (MDC.get(Constants.METHOD) != null) {
+            data.setMethod(MDC.get(Constants.METHOD));
+        }
+        if (MDC.get(Constants.URL) != null) {
+            data.setUrl(MDC.get(Constants.URL));
+        }
+        if (MDC.get(Constants.USER_ID) != null) {
+            data.setUserId(MDC.get(Constants.USER_ID));
+        }
+        if (!StringUtils.isBlank(MDC.get(Constants.SESSION_ID))) {
             data.setSessionId(MDC.get("sessionId"));
         }
         mongoTemplate.insert(data);

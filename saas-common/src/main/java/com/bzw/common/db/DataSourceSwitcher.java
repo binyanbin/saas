@@ -5,6 +5,9 @@ import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * @author yanbin
+ */
 public class DataSourceSwitcher extends AbstractRoutingDataSource {
 
     private ThreadLocal<String> contextHolder = new ThreadLocal<>();

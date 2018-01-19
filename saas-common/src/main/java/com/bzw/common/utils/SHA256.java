@@ -4,9 +4,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Created by yanbin on 2017/7/1.
+ *
+ * @author yanbin
+ * @date 2017/7/1
  */
-public class SHA256 {
+public class Sha256 {
     public static String encrypt(String strSrc) {
         MessageDigest md;
         String strDes;

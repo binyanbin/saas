@@ -1,11 +1,12 @@
 package com.bzw.common.handler;
 
 import com.bzw.common.content.*;
+import com.bzw.common.enums.Constants;
 import com.bzw.common.exception.api.InvalidAccessTokenException;
 import com.bzw.common.exception.api.InvalidSignException;
-import com.bzw.common.log.LogService;
+import com.bzw.common.log.LogServiceImpl;
 import com.bzw.common.log.model.TimeoutInfo;
-import com.bzw.common.utils.SHA256;
+import com.bzw.common.utils.Sha256;
 import com.bzw.common.utils.WebUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.MDC;
@@ -25,14 +26,15 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-
+/**
+ * @author yanbin
+ */
 @Component
 public class AccessHandler implements HandlerInterceptor {
 
     private WebSessionManager webSessionManager;
 
-
-    private LogService logService;
+    private LogServiceImpl logServiceImpl;
 
     private BeanFactory beanFactory;
 
@@ -40,9 +42,9 @@ public class AccessHandler implements HandlerInterceptor {
     private static String SIGN_KEY = "sign";
 
     @Autowired
-    public AccessHandler(WebSessionManager webSessionManager, LogService logService, BeanFactory beanFactory) {
+    public AccessHandler(WebSessionManager webSessionManager, LogServiceImpl logServiceImpl, BeanFactory beanFactory) {
         this.webSessionManager = webSessionManager;
-        this.logService = logService;
+        this.logServiceImpl = logServiceImpl;
         this.beanFactory = beanFactory;
     }
 
@@ -64,7 +66,7 @@ public class AccessHandler implements HandlerInterceptor {
         MDC.put("method", WebUtils.Http.getMethod(request));
         WebContext webContext = buildWebContext(request, response, beanFactory);
         boolean nonSessionValidation = false;
-        boolean nonSignValidaion =false;
+        boolean nonSignValidaion = false;
         if (handler instanceof HandlerMethod) {
             ApiMethodAttribute methodAttribute = ((HandlerMethod) handler).getMethod().getAnnotation(ApiMethodAttribute.class);
             if (null != methodAttribute) {
@@ -76,7 +78,7 @@ public class AccessHandler implements HandlerInterceptor {
         if (!request.getMethod().equals(RequestMethod.OPTIONS.name())) {
             WebSession webSession = validationSession(request, webContext, nonSessionValidation);
 
-            if (!nonSignValidaion && !validSign(request,nonSessionValidation)){
+            if (!nonSignValidaion && !validSign(request, nonSessionValidation)) {
                 throw new InvalidSignException();
             }
             loggerUserInfo(webSession);
@@ -85,7 +87,7 @@ public class AccessHandler implements HandlerInterceptor {
         if (!StringUtils.isBlank(sessionId)) {
             MDC.put("sessionId", sessionId);
         }
-        logService.insertDaily();
+        logServiceImpl.insertDaily();
         return true;
     }
 
@@ -136,8 +138,9 @@ public class AccessHandler implements HandlerInterceptor {
     }
 
     private boolean validSign(HttpServletRequest request, boolean nonSessionValidation) {
-        if (StringUtils.isBlank(request.getParameter(SIGN_KEY)))
+        if (StringUtils.isBlank(request.getParameter(SIGN_KEY))) {
             return false;
+        }
         List<String> list = Collections.list(request.getParameterNames());
         list.remove(SIGN_KEY);
         list.sort(Comparator.naturalOrder());
@@ -162,7 +165,7 @@ public class AccessHandler implements HandlerInterceptor {
             WebSession webSession = webSessionManager.get(sessionId);
             url.append(webSession.getSecretKey());
         }
-        String sign = SHA256.encrypt(url.toString());
+        String sign = Sha256.encrypt(url.toString());
         return sign.equals(request.getParameter(SIGN_KEY));
     }
 
@@ -182,21 +185,21 @@ public class AccessHandler implements HandlerInterceptor {
         long time = endTime - beginTime;
         if (time > timeSpan) {
             TimeoutInfo visit = new TimeoutInfo();
-            if (org.slf4j.MDC.get("ip") != null) {
-                visit.setIp(org.slf4j.MDC.get("ip"));
+            if (org.slf4j.MDC.get(Constants.IP) != null) {
+                visit.setIp(org.slf4j.MDC.get(Constants.IP));
             }
-            if (null != org.slf4j.MDC.get("userId")) {
-                visit.setUserId(org.slf4j.MDC.get("userId"));
+            if (null != org.slf4j.MDC.get(Constants.USER_ID)) {
+                visit.setUserId(org.slf4j.MDC.get(Constants.USER_ID));
             }
-            if (null != org.slf4j.MDC.get("url")) {
-                visit.setUrl(org.slf4j.MDC.get("url"));
+            if (null != org.slf4j.MDC.get(Constants.URL)) {
+                visit.setUrl(org.slf4j.MDC.get(Constants.URL));
             }
-            if (null != org.slf4j.MDC.get("url_body")) {
-                visit.setBody(org.slf4j.MDC.get("url_body"));
+            if (null != org.slf4j.MDC.get(Constants.URL_BODY)) {
+                visit.setBody(org.slf4j.MDC.get(Constants.URL_BODY));
             }
             visit.setMethod(method.getName());
             visit.setTimeSpan(time);
-            logService.insertVisit(visit);
+            logServiceImpl.insertVisit(visit);
         }
     }
 }

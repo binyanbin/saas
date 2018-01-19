@@ -1,7 +1,7 @@
 package com.bzw.common.exception;
 
 /**
- * Created by yanbin on 2017/7/1.
+ * @author :yanbin
  */
 public class ApplicationException extends RuntimeException {
 

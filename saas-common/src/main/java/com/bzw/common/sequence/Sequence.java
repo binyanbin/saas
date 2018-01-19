@@ -1,7 +1,9 @@
 package com.bzw.common.sequence;
 
 /**
- * Created by yanbin on 2017/7/8.
+ *
+ * @author yanbin
+ * @date 2017/7/8
  */
 public class Sequence {
     private String table;

@@ -1,5 +1,8 @@
 package com.bzw.common.web;
 
+/**
+ * @author yanbin
+ */
 public abstract class BaseController {
     /**
      * wrapper JSON view and set message

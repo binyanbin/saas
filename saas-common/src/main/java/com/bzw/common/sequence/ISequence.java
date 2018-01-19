@@ -4,24 +4,26 @@ package com.bzw.common.sequence;
 import java.util.List;
 
 /**
- * Created by yanbin on 2017/7/8.
+ *
+ * @author yanbin
+ * @date 2017/7/8
  */
 public interface ISequence {
 
     /**
-     * 获取一个新的序列, 请注意如果是执行批量插入, 则不要在你的Business Service中调用此方法,
-     * <br>否则因为是同一次事务, 还未commit, 你会获取到相同的ID
+     * 获取一个表序列id
      *
-     * @param seqName
-     * @return
+     * @param seqType 表类型
+     * @return id
      */
     Long newKey(SeqType seqType);
 
     /**
-     * 获取一个新的一组序列
+     * 获取一个表一组序列
      *
-     * @param seqName
-     * @return
+     * @param seqType 表类型
+     * @param size 长度
+     * @return 一组id
      */
     List<Long> newKeys(SeqType seqType, int size);
 

@@ -1,7 +1,9 @@
 package com.bzw.common.log.model;
 
 /**
- * Created by yanbin on 2017/7/10.
+ *
+ * @author yanbin
+ * @date 2017/7/10
  */
 
 public class TimeoutInfo {

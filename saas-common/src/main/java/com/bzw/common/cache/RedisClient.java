@@ -11,6 +11,9 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author yanbin
+ */
 @Component
 public class RedisClient implements ICacheClient {
 

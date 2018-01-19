@@ -11,7 +11,9 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 /**
- * Created by yanbin on 2017/7/1.
+ *
+ * @author yanbin
+ * @date 2017/7/1
  */
 @Component
 public class WebSessionManager {

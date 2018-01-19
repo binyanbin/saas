@@ -1,9 +1,12 @@
 package com.bzw.common.exception;
 
 /**
- * Created by yanbin on 2017/7/1.
+ * @author :yanbin
  */
 public enum ApplicationErrorCode {
+    /*
+      接口异常
+     */
     ArgumentsIncorrect("10001", "参数不正确"),
     InvalidAccessToken("10010", "会话已失效,请重新登录"),
     UnKnowException("10014", "发生未知异常"),

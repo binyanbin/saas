@@ -1,6 +1,13 @@
 package com.bzw.common.enums;
 
+/**
+ * @author yanbin
+ */
+
 public enum  Status {
+    /**
+     * 数据状态
+     */
     Valid(1, "启用"),
     Invalid(0, "禁用"),
     Delete(2, "删除"),;

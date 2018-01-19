@@ -1,6 +1,6 @@
 package com.bzw.common.exception;
 
-import com.bzw.common.log.LogService;
+import com.bzw.common.log.LogServiceImpl;
 import com.bzw.common.web.JsonExceptionWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,18 +10,20 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Created by yanbin on 2017/7/1.
+ *
+ * @author yanbin
+ * @date 2017/7/1
  */
 @ControllerAdvice
 @ResponseBody
 @CrossOrigin
 public class ExceptionAdvice {
 
-    private LogService logService;
+    private LogServiceImpl logServiceImpl;
 
     @Autowired
-    public ExceptionAdvice(LogService logService){
-        this.logService = logService;
+    public ExceptionAdvice(LogServiceImpl logServiceImpl){
+        this.logServiceImpl = logServiceImpl;
     }
 
     /**
@@ -65,7 +67,7 @@ public class ExceptionAdvice {
 
     private JsonExceptionWrapper wrapperException(Throwable e) {
         JsonExceptionWrapper jsonExceptionWrapper = new JsonExceptionWrapper(e);
-        logService.insertExcept(jsonExceptionWrapper);
+        logServiceImpl.insertExcept(jsonExceptionWrapper);
         return jsonExceptionWrapper;
     }
 }

@@ -5,7 +5,9 @@ import org.springframework.data.annotation.Id;
 import java.io.Serializable;
 
 /**
- * Created by yanbin on 2017/1/16.
+ *
+ * @author yanbin
+ * @date 2017/1/16
  */
 public class Daily implements Serializable {
     private String ip;

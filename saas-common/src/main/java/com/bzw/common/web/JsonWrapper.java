@@ -1,7 +1,9 @@
 package com.bzw.common.web;
 
 /**
- * Created by yanbin on 2017/7/1.
+ *
+ * @author yanbin
+ * @date 2017/7/1
  */
 public class JsonWrapper {
     private String code;

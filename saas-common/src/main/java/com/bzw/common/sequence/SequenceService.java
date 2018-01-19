@@ -12,15 +12,17 @@ import org.springframework.util.CollectionUtils;
 import java.util.List;
 
 /**
- * Created by yanbin on 2017/7/8.
+ *
+ * @author yanbin
+ * @date 2017/7/8
  */
 @Service
 public class SequenceService implements ISequence {
 
     private MongoTemplate mongoTemplate;
-    private static String __TABLE = "table";
-    private static String __VALUE = "nextValue";
-    private static Long __INIT_ID = 10000L;
+    private static final String TABLE = "table";
+    private static final String VALUE = "nextValue";
+    private static final Long INIT_ID = 10000L;
 
     @Autowired
     public SequenceService(MongoTemplate mongoTemplate) {
@@ -31,17 +33,17 @@ public class SequenceService implements ISequence {
     public Long newKey(SeqType seqType) {
         String key = seqType.getKey();
         initKey(key);
-        Query query = Query.query(Criteria.where(__TABLE).is(key));
-        Update update = new Update().inc(__VALUE, 1);
+        Query query = Query.query(Criteria.where(TABLE).is(key));
+        Update update = new Update().inc(VALUE, 1);
         Sequence sequence = mongoTemplate.findAndModify(query, update, Sequence.class);
         return sequence.getNextValue();
     }
 
     private void initKey(String table) {
-        Query query = Query.query(Criteria.where(__TABLE).is(table));
+        Query query = Query.query(Criteria.where(TABLE).is(table));
         List<Sequence> sequenceList = mongoTemplate.find(query,Sequence.class);
         if (CollectionUtils.isEmpty(sequenceList)){
-            mongoTemplate.insert(new Sequence(table,__INIT_ID));
+            mongoTemplate.insert(new Sequence(table, INIT_ID));
         }
     }
 
@@ -49,8 +51,8 @@ public class SequenceService implements ISequence {
     public List<Long> newKeys(SeqType seqType, int size) {
         String table = seqType.getKey();
         initKey(table);
-        Query query = Query.query(Criteria.where(__TABLE).is(table));
-        Update update = new Update().inc(__VALUE, size);
+        Query query = Query.query(Criteria.where(TABLE).is(table));
+        Update update = new Update().inc(VALUE, size);
         Sequence sequence = mongoTemplate.findAndModify(query, update, Sequence.class);
         List<Long> result = Lists.newArrayList();
         for (int i = 0; i < size; i++) {

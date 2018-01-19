@@ -3,12 +3,15 @@ package com.bzw.common.utils;
 import com.bzw.common.content.ThreadWebContextHolder;
 import com.bzw.common.content.WebContext;
 import com.bzw.common.content.WebSession;
+import com.bzw.common.enums.Constants;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Created by yanbin on 2017/7/1.
+ *
+ * @author yanbin
+ * @date 2017/7/1
  */
 public final class WebUtils {
 
@@ -31,11 +34,12 @@ public final class WebUtils {
             if (isInvalidIP(ip)) {
                 ip = request.getRemoteAddr();
             }
-            if (isInvalidIP(ip)) { // get X-real-ip from nginx
-                ip = request.getHeader("X-real-ip");
+            // get X-real-ip from nginx
+            if (isInvalidIP(ip)) {
+                ip = request.getHeader(Constants.X_REAL_IP);
             }
-            if (isInvalidIP(ip) && null != request.getAttribute("X-real-ip")) {
-                ip = request.getAttribute("X-real-ip").toString();
+            if (isInvalidIP(ip) && null != request.getAttribute(Constants.X_REAL_IP)) {
+                ip = request.getAttribute(Constants.X_REAL_IP).toString();
             }
             if (null == ip) {
                 ip = "unknown";
@@ -120,7 +124,7 @@ public final class WebUtils {
             return sessionId;
         }
 
-        public static String getId(){
+        public static String getId() {
             WebSession session = get();
             assert session != null;
             return session.getId();
@@ -152,7 +156,7 @@ public final class WebUtils {
             return session.getUserId();
         }
 
-        public static Long getEmployeeId(){
+        public static Long getEmployeeId() {
             WebSession session = get();
             assert session != null;
             return session.getEmployeeId();
