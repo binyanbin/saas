@@ -1,6 +1,6 @@
 # project
 application:
-    title: 报钟王saas-webapi
+    title: saas-webapi
     version: 0.0.1
 # monitor port
 server:
