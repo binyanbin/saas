@@ -32,6 +32,12 @@ public class OrderEventBiz {
         }
     }
 
+    public void updateOrderDetails(List<OrderDetail> orderDetails){
+        for (OrderDetail orderDetail :orderDetails){
+            orderDetailMapper.updateByPrimaryKeySelective(orderDetail);
+        }
+    }
+
     public void update(Order order){
         orderMapper.updateByPrimaryKeySelective(order);
     }

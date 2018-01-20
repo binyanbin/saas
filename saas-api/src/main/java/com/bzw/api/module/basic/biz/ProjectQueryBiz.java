@@ -29,6 +29,9 @@ public class ProjectQueryBiz {
     @Autowired
     private TechnicianProjectMapper technicianProjectMapper;
 
+    public Project getProject(Integer id){
+        return projectMapper.selectByPrimaryKey(id);
+    }
 
     public List<Project> listProjectsByRoomId(Long roomId) {
         Room room = roomMapper.selectByPrimaryKey(roomId);

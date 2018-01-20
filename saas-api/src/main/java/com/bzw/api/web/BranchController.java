@@ -25,6 +25,12 @@ public class BranchController extends BaseController {
         return wrapperJsonView(customerQueryService.listRoomsByBranchId(branchId));
     }
 
+    @RequestMapping("/{branchId}/project/{projectId}/rooms")
+    @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
+    public Object listRooms(@PathVariable Long branchId,@PathVariable Integer projectId) {
+        return wrapperJsonView(customerQueryService.listRoomsByBranchId(branchId,projectId));
+    }
+
     @RequestMapping("/{branchId}/technicians")
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
     public Object listTechnicians(@PathVariable Long branchId, @RequestParam(required = false,defaultValue = "1") Integer sort){

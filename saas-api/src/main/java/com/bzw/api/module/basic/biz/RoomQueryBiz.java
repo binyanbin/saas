@@ -41,6 +41,12 @@ public class RoomQueryBiz {
         return roomMapper.selectByExample(roomExample);
     }
 
+    public List<Room> listRoomByBranchId(Long branchId,Integer type){
+        RoomExample roomExample = new RoomExample();
+        roomExample.createCriteria().andBranchIdEqualTo(branchId).andStatusIdEqualTo(Status.Valid.getValue()).andTypeEqualTo(type);
+        return roomMapper.selectByExample(roomExample);
+    }
+
     public List<Room> listRoomByProjectId(Integer projectId) {
         Project project = projectMapper.selectByPrimaryKey(projectId);
         Integer type = project.getType();
@@ -55,4 +61,6 @@ public class RoomQueryBiz {
         roomExample.createCriteria().andIdIn(roomIds);
         return roomMapper.selectByExample(roomExample);
     }
+
+
 }

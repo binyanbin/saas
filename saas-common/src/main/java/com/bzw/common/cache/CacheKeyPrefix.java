@@ -13,7 +13,8 @@ public enum CacheKeyPrefix {
     DuplicateSubmission("dup_sub_", "重复提交验证", TimeUnit.SECONDS.toSeconds(30)),
     UserSession("user_session_", "用户Session", TimeUnit.DAYS.toSeconds(7)),
     ApiSign("api_sign_", "api接口签名", TimeUnit.MINUTES.toSeconds(15)),
-    Lock("lock_", "锁", TimeUnit.MINUTES.toSeconds(5)),;
+    Lock("lock_", "锁", TimeUnit.MINUTES.toSeconds(5)),
+    mobile("mobile_code_","验证码",TimeUnit.MINUTES.toSeconds(15)),;
 
     CacheKeyPrefix(String value, String desc, long timeout) {
         this.key = value;

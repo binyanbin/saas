@@ -29,4 +29,10 @@ public class UserQueryBiz {
         userExample.createCriteria().andIdEqualTo(id).andStatusIdEqualTo(Status.Valid.getValue());
         return userMapper.selectByExample(userExample);
     }
+
+    public List<User> listUserByPhone(String phone){
+        UserExample userExample = new UserExample();
+        userExample.createCriteria().andPhoneEqualTo(phone).andStatusIdEqualTo(Status.Valid.getValue());
+        return userMapper.selectByExample(userExample);
+    }
 }

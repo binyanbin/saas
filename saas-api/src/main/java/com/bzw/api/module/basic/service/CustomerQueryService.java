@@ -1,15 +1,13 @@
 package com.bzw.api.module.basic.service;
 
-import com.bzw.api.module.basic.biz.OrderQueryBiz;
-import com.bzw.api.module.basic.biz.ProjectQueryBiz;
-import com.bzw.api.module.basic.biz.RoomQueryBiz;
-import com.bzw.api.module.basic.biz.TechnicianQueryBiz;
+import com.bzw.api.module.basic.biz.*;
 import com.bzw.api.module.basic.dto.*;
 import com.bzw.api.module.basic.enums.OrderState;
 import com.bzw.api.module.basic.enums.ProjectType;
 import com.bzw.api.module.basic.enums.RoomState;
 import com.bzw.api.module.basic.enums.TechnicianState;
 import com.bzw.api.module.basic.model.*;
+import com.bzw.api.module.platform.model.User;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +35,9 @@ public class CustomerQueryService {
     @Autowired
     private TechnicianQueryBiz technicianQueryBiz;
 
+    @Autowired
+    private UserQueryBiz userQueryBiz;
+
     public BranchDTO getBranchByRoomId(Long roomId) {
         Branch branch = roomQueryBiz.getBranchByRoomId(roomId);
         if (branch == null) {
@@ -49,6 +50,11 @@ public class CustomerQueryService {
             result.setTelephone(branch.getTelephone());
             return result;
         }
+    }
+
+    public Boolean containPhone(String phone){
+        List<User> users = userQueryBiz.listUserByPhone(phone);
+        return !CollectionUtils.isEmpty(users);
     }
 
     public List<ProjectDTO> listProjectsByBranchId(Long branchId) {
@@ -86,6 +92,13 @@ public class CustomerQueryService {
         return mapToRoomDTOs(rooms);
     }
 
+    public List<RoomDTO> listRoomsByBranchId(Long branchId,Integer projectId) {
+        Project project = projectQueryBiz.getProject(projectId);
+        List<Room> rooms = roomQueryBiz.listRoomByBranchId(branchId,project.getType());
+        return mapToRoomDTOs(rooms);
+    }
+
+
     public List<RoomDTO> listRoomByProjectId(Integer projectId) {
         List<Room> rooms = roomQueryBiz.listRoomByProjectId(projectId);
         return mapToRoomDTOs(rooms);
@@ -103,11 +116,14 @@ public class CustomerQueryService {
         RoomDTO roomDTO = new RoomDTO();
         roomDTO.setId(room.getId());
         roomDTO.setName(room.getNumber());
-        roomDTO.setStateName(RoomState.parse(room.getStatusId()).getDesc());
-        roomDTO.setStateId(room.getStatusId());
+        roomDTO.setBizStatusName(RoomState.parse(room.getBizStatusId()).getDesc());
+        roomDTO.setBizStatusId(room.getBizStatusId());
         roomDTO.setHaveRestRoom(room.getHaveRestroom() == 1);
         roomDTO.setTypeId(room.getType());
         roomDTO.setTypeName(ProjectType.parse(room.getType()).getDesc());
+        roomDTO.setBedNumber(room.getBedNumber());
+        roomDTO.setStartTime(room.getStartTime());
+        roomDTO.setOverTime(room.getOverTime());
         return roomDTO;
     }
 

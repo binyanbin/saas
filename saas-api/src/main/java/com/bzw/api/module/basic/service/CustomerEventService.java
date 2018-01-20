@@ -5,14 +5,19 @@ import com.bzw.api.module.basic.enums.*;
 import com.bzw.api.module.basic.model.*;
 import com.bzw.api.module.basic.param.OrderParam;
 import com.bzw.api.module.platform.model.User;
+import com.bzw.common.cache.CacheKeyPrefix;
+import com.bzw.common.cache.ICacheClient;
 import com.bzw.common.content.WebSession;
 import com.bzw.common.content.WebSessionManager;
+import com.bzw.common.exception.api.PhoneNotExisitsException;
 import com.bzw.common.exception.api.UserLoginFailException;
 import com.bzw.common.exception.api.WechatLoginFailException;
+import com.bzw.common.exception.api.WrongSmsCodeException;
 import com.bzw.common.sequence.SeqType;
 import com.bzw.common.sequence.SequenceService;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -70,6 +75,9 @@ public class CustomerEventService {
     @Autowired
     private WebSessionManager webSessionManager;
 
+    @Autowired
+    private ICacheClient cacheClient;
+
 
     public boolean updateRoomState(Long roomId, Integer statusId, Long employeeId) {
         Room room = roomQueryBiz.getRoom(roomId);
@@ -81,7 +89,7 @@ public class CustomerEventService {
         RoomExample roomExample = new RoomExample();
         roomExample.createCriteria().andIdEqualTo(roomId).andVersionIdEqualTo(room.getVersionId());
         Room updateRoom = new Room();
-        updateRoom.setStatusId(statusId);
+        updateRoom.setBizStatusId(statusId);
         updateRoom.setModifiedTime(now);
         updateRoom.setModifiedId(employee.getId());
         updateRoom.setVersionId(room.getVersionId() + 1);
@@ -91,8 +99,32 @@ public class CustomerEventService {
         statusIds.add(RoomState.pause.getValue());
         if (statusIds.contains(statusId)) {
             updateRoom.setOrderId(0L);
+            updateRoom.setStartTime(null);
+            updateRoom.setOverTime(null);
         }
-        int result = roomEventBiz.updateRoom(updateRoom,roomId,room.getVersionId());
+        if (statusId.equals(RoomState.serving.getValue())){
+            List<OrderDetail> orderDetails = orderQueryBiz.listOrderDetail(room.getOrderId());
+            int max = 0;
+            for (OrderDetail orderDetail : orderDetails){
+                if (orderDetail.getDuration()==null){
+                    orderDetail.setDuration(0);
+                }
+                if (orderDetail.getDuration()>max){
+                    max = orderDetail.getDuration();
+                    orderDetail.setBeginTime(now);
+                    orderDetail.setEndTime(DateUtils.addMinutes(now,orderDetail.getDuration()));
+                }
+            }
+            room.setStartTime(now);
+            room.setOverTime(DateUtils.addMinutes(now,max));
+            roomEventBiz.updateRoom(room);
+            orderEventBiz.updateOrderDetails(orderDetails);
+        }
+        if (statusId.equals(RoomState.using.getValue())){
+            room.setStartTime(now);
+            roomEventBiz.updateRoom(room);
+        }
+        int result = roomEventBiz.updateRoom(updateRoom, roomId, room.getVersionId());
         if (result > 0) {
             RecordChange recordChange = new RecordChange();
             recordChange.setId(sequenceService.newKey(SeqType.recordChange));
@@ -109,7 +141,7 @@ public class CustomerEventService {
     }
 
     public WebSession login(String code, String password) {
-        List<User> users = userQueryBiz.listLoginUser(code,password);
+        List<User> users = userQueryBiz.listLoginUser(code, password);
         if (CollectionUtils.isEmpty(users)) {
             throw new UserLoginFailException();
         }
@@ -129,10 +161,15 @@ public class CustomerEventService {
         webSession.setBranchId(employee.getBranchId());
 
         Branch branch = branchQueryBiz.getBranch(employee.getBranchId());
-        webSession.setBranchName(branch.getName());
-        Tenant tenant = tenantQueryBiz.getTenant(branch.getId());
-        webSession.setTenantName(tenant.getName());
+        if (branch != null) {
+            webSession.setBranchName(branch.getName());
+        }
         webSession.setOpenId(employee.getWechatId());
+        Tenant tenant = tenantQueryBiz.getTenant(branch.getId());
+        if (tenant != null) {
+            webSession.setTenantName(tenant.getName());
+        }
+
         user.setLastLoginDate(new Date());
         userEventBiz.updateUser(user);
         return webSessionManager.add(webSession, webSessionManager.newId(user.getId()), webSessionManager.newSecretKey());
@@ -163,6 +200,49 @@ public class CustomerEventService {
         webSession.setTenantName(tenant.getName());
         user.setLastLoginDate(new Date());
         userEventBiz.updateUser(user);
+        return webSessionManager.add(webSession, webSessionManager.newId(user.getId()), webSessionManager.newSecretKey());
+    }
+
+    public WebSession loginBySmsCode(String phone, String smsCode) {
+        List<User> users = userQueryBiz.listUserByPhone(phone);
+        if (CollectionUtils.isEmpty(users)) {
+            throw new PhoneNotExisitsException();
+        }
+        String phoneKey = CacheKeyPrefix.mobile.getKey() + phone;
+        if (cacheClient.hasKey(phoneKey)) {
+            String code = cacheClient.get(phoneKey);
+            if (!code.equals(smsCode)) {
+                throw new WrongSmsCodeException();
+            }
+        } else {
+            throw new WrongSmsCodeException();
+        }
+        User user = users.get(0);
+        List<Employee> employees = employeeQueryBiz.listEmployeeByUserId(user.getId());
+        if (CollectionUtils.isEmpty(employees)) {
+            throw new UserLoginFailException();
+        }
+        Employee employee = employees.get(0);
+        WebSession webSession = new WebSession();
+        webSession.setTenantId(employee.getTenantId());
+        webSession.setRoleName(RoleType.parse(employee.getRoleType()).getDesc());
+        webSession.setUserId(user.getId());
+        webSession.setEmployeeId(employee.getId());
+        webSession.setRoleType(employee.getRoleType());
+        webSession.setName(employee.getName());
+        webSession.setBranchId(employee.getBranchId());
+        Branch branch = branchQueryBiz.getBranch(employee.getBranchId());
+        if (branch != null) {
+            webSession.setBranchName(branch.getName());
+        }
+        webSession.setOpenId(employee.getWechatId());
+        Tenant tenant = tenantQueryBiz.getTenant(branch.getId());
+        if (tenant != null) {
+            webSession.setTenantName(tenant.getName());
+        }
+        user.setLastLoginDate(new Date());
+        userEventBiz.updateUser(user);
+        cacheClient.delete(phoneKey);
         return webSessionManager.add(webSession, webSessionManager.newId(user.getId()), webSessionManager.newSecretKey());
     }
 
@@ -245,6 +325,7 @@ public class CustomerEventService {
                 orderDetail.setTechnicianName(technician.getName());
                 orderDetail.setRoomName(room1.getNumber());
                 orderDetail.setTypeId(OrderType.CustomerReservation.getValue());
+                orderDetail.setDuration(project.getDuration());
                 orderDetails.add(orderDetail);
                 totalPrice = totalPrice.add(project.getPrice());
             }

@@ -22,6 +22,6 @@ public class RoomEventBiz {
     }
 
     public void updateRoom(Room room){
-        roomMapper.updateByPrimaryKeySelective(room);
+        roomMapper.updateByPrimaryKey(room);
     }
 }
