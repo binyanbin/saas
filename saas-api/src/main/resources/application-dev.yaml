@@ -74,13 +74,12 @@ spring:
 logging:
     level:
       root: info
-
 wechat:
-  appid: wxc96bdb8e9e2e8a72
-  secret: 3650b0af5b3e467f766907d16a11581e
+  appid: xxxxxxxxxxxx
+  secret: xxxxxxxxxxxxxxxxxxxxxx
 
 sms:
-  url:
-  account: 100@500907940319
-  secret: CF6B5A96184ED58D97B33E5B94DE0030
-  chanel: 8311
+  url: xxxxxxxxxx
+  account: xxxxxxxxxx
+  secret: xxxxxxxxxxxxxxxxxxx
+  chanel: xxxx
