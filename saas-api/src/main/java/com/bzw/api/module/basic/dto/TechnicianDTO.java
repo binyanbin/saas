@@ -1,5 +1,7 @@
 package com.bzw.api.module.basic.dto;
 
+import java.util.Date;
+
 /**
  * @author yanbin
  */
@@ -15,6 +17,7 @@ public class TechnicianDTO {
     private String jobNumber;
     private Integer praise;
     private Integer orderCount;
+    private Date overTime;
 
     public Integer getOrderCount() {
         return orderCount;
@@ -94,6 +97,14 @@ public class TechnicianDTO {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Date getOverTime() {
+        return overTime;
+    }
+
+    public void setOverTime(Date overTime) {
+        this.overTime = overTime;
     }
 
     @Override

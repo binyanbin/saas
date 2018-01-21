@@ -8,9 +8,9 @@ public enum OrderDetailState {
      * 订单明细状态
      */
     booked(1, "已预定"),
-    paid(2, "已支付"),
+    Serving(2, "服务中"),
     finished(3,"服务完成"),
-    canceled(4,"订单取消"),
+    cancel(4,"服务取消"),
     ;
 
     private Integer value;

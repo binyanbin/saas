@@ -2,6 +2,7 @@ package com.bzw.api.web;
 
 import com.bzw.api.module.basic.service.CustomerEventService;
 import com.bzw.api.module.basic.service.CustomerQueryService;
+import com.bzw.api.module.basic.service.RoomEventService;
 import com.bzw.api.module.basic.service.WechatService;
 import com.bzw.common.content.ApiMethodAttribute;
 import com.bzw.common.utils.WebUtils;
@@ -34,6 +35,9 @@ public class RoomController extends BaseController {
     CustomerEventService customerEventService;
 
     @Autowired
+    RoomEventService roomEventService;
+
+    @Autowired
     WechatService wechatService;
 
     @RequestMapping("/{roomId}/branch")
@@ -64,7 +68,7 @@ public class RoomController extends BaseController {
     @ApiMethodAttribute(nonSignatureValidation = true)
     public Object updateRoomState(@PathVariable Long roomId, @RequestParam Integer statusId) {
         Preconditions.checkArgument(customerQueryService.getRoom(roomId) != null, "房间id不存在");
-        return wrapperJsonView(customerEventService.updateRoomState(roomId, statusId, WebUtils.Session.getEmployeeId()));
+        return wrapperJsonView(roomEventService.updateRoomState(roomId, statusId, WebUtils.Session.getEmployeeId()));
     }
 
     @RequestMapping(value = "{roomId}/qrcode", method = {RequestMethod.GET})

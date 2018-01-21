@@ -151,6 +151,7 @@ public class CustomerQueryService {
             technicianDTO.setJobNumber(technician.getJobNumber());
             technicianDTO.setPraise(technician.getPraise());
             technicianDTO.setOrderCount(technician.getOrderCount());
+            technicianDTO.setOverTime(technician.getOverTime());
             result.add(technicianDTO);
         }
         return result;
