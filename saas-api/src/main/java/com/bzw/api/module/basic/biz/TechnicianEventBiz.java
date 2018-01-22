@@ -16,9 +16,13 @@ public class TechnicianEventBiz {
     @Autowired
     private TechnicianMapper technicianMapper;
 
-    public void updateTechnicians(List<Technician> technicianList){
+    public void updateList(List<Technician> technicianList){
         for (Technician technician :technicianList){
             technicianMapper.updateByPrimaryKey(technician);
         }
+    }
+
+    public void updateTechnician(Technician technician){
+        technicianMapper.updateByPrimaryKey(technician);
     }
 }

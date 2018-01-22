@@ -38,6 +38,10 @@ public class OrderEventBiz {
         }
     }
 
+    public void updateOrderDetail(OrderDetail orderDetail){
+        orderDetailMapper.updateByPrimaryKeySelective(orderDetail);
+    }
+
     public void update(Order order){
         orderMapper.updateByPrimaryKeySelective(order);
     }

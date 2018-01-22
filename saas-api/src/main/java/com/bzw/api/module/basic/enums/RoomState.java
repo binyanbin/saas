@@ -10,11 +10,10 @@ public enum RoomState {
      */
     free(1, "空闲"),
     booked(2, "预定"),
-    using(3, "使用中"),
-    serving(4,"服务中"),
-    resting(5,"休息中"),
-    cleaning(6,"清理中"),
-    pause(7,"暂停使用");
+    open(3, "开房"),
+    waiting(4,"等待"),
+    unfinished(5,"未结账"),
+    ;
 
     private Integer value;
 

@@ -15,13 +15,13 @@ public class RoomEventBiz {
     @Autowired
     private RoomMapper roomMapper;
 
-    public int updateRoom(Room room,Long id,Integer version){
+    public int update(Room room, Long id, Integer version){
         RoomExample roomExample = new RoomExample();
         roomExample.createCriteria().andIdEqualTo(id).andVersionIdEqualTo(version);
         return roomMapper.updateByExampleSelective(room, roomExample);
     }
 
-    public void updateRoom(Room room){
+    public void update(Room room){
         roomMapper.updateByPrimaryKey(room);
     }
 }

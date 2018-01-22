@@ -10,6 +10,7 @@ public enum OrderState {
      */
     non_payment(1, "未支付"),
     paid(2, "已支付"),
+    cancel(3,"已取消")
     ;
 
     private Integer value;

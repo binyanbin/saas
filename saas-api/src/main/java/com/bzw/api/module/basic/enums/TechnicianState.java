@@ -11,7 +11,8 @@ public enum TechnicianState {
     free(1, "空闲"),
     booked(2, "预定"),
     serving(3,"服务中"),
-    vacation(4,"休假");
+    servingAndBooked(4,"服务中并预定"),
+    vcation(5,"休假"),;
 
     private Integer value;
 

@@ -7,10 +7,12 @@ import com.bzw.api.module.basic.service.WechatService;
 import com.bzw.common.content.ApiMethodAttribute;
 import com.bzw.common.utils.WebUtils;
 import com.bzw.common.web.BaseController;
-import com.google.common.base.Preconditions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -64,17 +66,28 @@ public class RoomController extends BaseController {
         return wrapperJsonView(customerQueryService.getOrderByRoomId(roomId));
     }
 
-    @RequestMapping(value = "/{roomId}", method = {RequestMethod.POST, RequestMethod.OPTIONS})
+    @RequestMapping(value = "/{roomId}/book", method = {RequestMethod.POST, RequestMethod.OPTIONS})
     @ApiMethodAttribute(nonSignatureValidation = true)
-    public Object updateRoomState(@PathVariable Long roomId, @RequestParam Integer statusId) {
-        Preconditions.checkArgument(customerQueryService.getRoom(roomId) != null, "房间id不存在");
-        return wrapperJsonView(roomEventService.updateRoomState(roomId, statusId, WebUtils.Session.getEmployeeId()));
+    public Object bookRoom(@PathVariable Long roomId) {
+        return wrapperJsonView(roomEventService.book(roomId,WebUtils.Session.getEmployeeId()));
+    }
+
+    @RequestMapping(value="/{roomId}/cancel", method = {RequestMethod.POST, RequestMethod.OPTIONS})
+    @ApiMethodAttribute(nonSignatureValidation = true)
+    public Object cancelRoom(@PathVariable Long roomId){
+        return wrapperJsonView(roomEventService.cancel(roomId, WebUtils.Session.getEmployeeId()));
+    }
+
+    @RequestMapping(value = "/{roomId}/open", method = {RequestMethod.POST, RequestMethod.OPTIONS})
+    @ApiMethodAttribute(nonSignatureValidation = true)
+    public Object open(@PathVariable Long roomId) {
+        return wrapperJsonView(roomEventService.open(roomId, WebUtils.Session.getEmployeeId()));
     }
 
     @RequestMapping(value = "{roomId}/qrcode", method = {RequestMethod.GET})
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
     public void qrCode(@PathVariable Long roomId, HttpServletResponse response) throws IOException {
-        String accessToken = wechatService.getAccessToken(appid, secret);
+        String accessToken = wechatService.getAccessToken();
         response.setContentType("image/png");
         OutputStream stream = response.getOutputStream();
         stream.write(wechatService.getGrCode("pages/projectlist/projectlist", accessToken, "room_" + roomId.toString()));

@@ -11,7 +11,6 @@ import com.bzw.common.utils.WebUtils;
 import com.bzw.common.web.BaseController;
 import com.google.common.base.Preconditions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.xml.sax.SAXException;
 
@@ -37,17 +36,10 @@ public class UserController extends BaseController {
     @Autowired
     private SmsService smsService;
 
-    @Value("${wechat.appid}")
-    private String appid;
-
-    @Value("${wechat.secret}")
-    private String secret;
-
-
     @RequestMapping(value = "/{phone}/smscode", method = {RequestMethod.OPTIONS, RequestMethod.POST})
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
     public Object getSmsCode(@PathVariable String phone) throws ParserConfigurationException, SAXException, IOException {
-        Preconditions.checkArgument(customerQueryService.containPhone(phone),"系统不存在该手机号");
+        Preconditions.checkArgument(customerQueryService.containPhone(phone), "系统不存在该手机号");
         return wrapperJsonView(smsService.sendSms(phone));
     }
 
@@ -65,32 +57,30 @@ public class UserController extends BaseController {
 
     @RequestMapping(value = "/login/{phone}/{smsCode}", method = {RequestMethod.OPTIONS, RequestMethod.POST})
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
-    public Object smsCodeLogin(@PathVariable String phone,@PathVariable String smsCode) {
-        return wrapperJsonView(customerEventService.loginBySmsCode(phone,smsCode));
+    public Object smsCodeLogin(@PathVariable String phone, @PathVariable String smsCode) {
+        return wrapperJsonView(customerEventService.loginBySmsCode(phone, smsCode));
     }
 
     @RequestMapping(value = "/login/code/{jscode}", method = {RequestMethod.OPTIONS, RequestMethod.POST})
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
     public Object codeLogin(@PathVariable String jscode) {
-        String openId = wechatService.getOpenId(appid, secret, jscode);
+        String openId = wechatService.getOpenId(jscode);
         if (null == openId) {
             throw new UserLoginFailException();
         }
         return wrapperJsonView(customerEventService.openIdLogin(openId));
     }
 
-    @RequestMapping(value="wechat/accesstoken")
+    @RequestMapping(value = "openId/{jscode}")
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
-    public Object accessToken(){
-        return wrapperJsonView(wechatService.getAccessToken(appid,secret));
+    public Object accessToken(@PathVariable String jscode) {
+        return wrapperJsonView(wechatService.getOpenId(jscode));
     }
 
-
-
-    @RequestMapping(value="wechat/openId/{jscode}")
+    @RequestMapping(value = "wechat/openId/{jscode}")
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
     public Object getOpenId(@PathVariable String jscode) {
-        return wrapperJsonView(wechatService.getOpenId(appid, secret, jscode));
+        return wrapperJsonView(wechatService.getOpenId(jscode));
     }
 
     @RequestMapping(value = "/{userId}/orders")

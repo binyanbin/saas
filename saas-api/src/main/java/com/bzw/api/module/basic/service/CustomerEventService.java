@@ -90,11 +90,10 @@ public class CustomerEventService {
             throw new WechatLoginFailException();
         }
         Employee employee = employees.get(0);
-        List<User> users = userQueryBiz.listUserById(employee.getUserId());
-        if (CollectionUtils.isEmpty(users)) {
+        User user = userQueryBiz.getUser(employee.getUserId());
+        if (user == null) {
             throw new WechatLoginFailException();
         }
-        User user = users.get(0);
         WebSession webSession = new WebSession();
         webSession.setTenantId(employee.getTenantId());
         webSession.setRoleName(RoleType.parse(employee.getRoleType()).getDesc());

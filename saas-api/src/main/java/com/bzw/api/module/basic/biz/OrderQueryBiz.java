@@ -25,6 +25,10 @@ public class OrderQueryBiz {
         return orderMapper.selectByPrimaryKey(orderId);
     }
 
+    public OrderDetail getOrderDetail(Long detailId){
+        return orderDetailMapper.selectByPrimaryKey(detailId);
+    }
+
     public List<OrderDetail> listOrderDetail(Long orderId){
         OrderDetailExample orderDetailExample = new OrderDetailExample();
         orderDetailExample.createCriteria().andOrderIdEqualTo(orderId);
