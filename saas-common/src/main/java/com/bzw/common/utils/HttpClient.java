@@ -240,6 +240,29 @@ public class HttpClient {
         return null;
     }
 
+    public static String postJsonStr(String url, String content) {
+        HttpPost httppost = new HttpPost(url);
+        setPostJson(httppost, content);
+        CloseableHttpResponse response = null;
+        try {
+            response = getHttpClient(url).execute(httppost,
+                    HttpClientContext.create());
+            HttpEntity entity = response.getEntity();
+            return EntityUtils.toString(entity);
+        } catch (Exception e) {
+            logger.error(e, e);
+        } finally {
+            try {
+                if (response != null) {
+                    response.close();
+                }
+            } catch (IOException e) {
+                logger.error(e, e);
+            }
+        }
+        return null;
+    }
+
     private static String httpResult (CloseableHttpResponse response) throws IOException {
         HttpEntity entity = response.getEntity();
         String result = EntityUtils.toString(entity, "utf-8");
