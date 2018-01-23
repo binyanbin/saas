@@ -1,6 +1,6 @@
 package com.bzw.api.web;
 
-import com.bzw.api.module.platform.service.InitService;
+import com.bzw.api.module.basic.service.InitService;
 import com.bzw.common.content.ApiMethodAttribute;
 import com.bzw.common.web.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;

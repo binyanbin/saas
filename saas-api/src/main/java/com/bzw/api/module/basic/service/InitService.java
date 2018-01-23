@@ -1,4 +1,4 @@
-package com.bzw.api.module.platform.service;
+package com.bzw.api.module.basic.service;
 
 import com.bzw.api.module.basic.dao.*;
 import com.bzw.api.module.basic.enums.ProjectType;
@@ -6,8 +6,8 @@ import com.bzw.api.module.basic.enums.RoleType;
 import com.bzw.api.module.basic.enums.RoomState;
 import com.bzw.api.module.basic.enums.TechnicianState;
 import com.bzw.api.module.basic.model.*;
-import com.bzw.api.module.platform.dao.UserMapper;
-import com.bzw.api.module.platform.model.User;
+import com.bzw.api.module.basic.dao.UserMapper;
+import com.bzw.api.module.basic.model.User;
 import com.bzw.common.enums.Status;
 import com.bzw.common.sequence.SeqType;
 import com.bzw.common.sequence.SequenceService;

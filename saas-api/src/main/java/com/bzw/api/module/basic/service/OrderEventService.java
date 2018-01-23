@@ -4,7 +4,7 @@ import com.bzw.api.module.basic.biz.*;
 import com.bzw.api.module.basic.enums.*;
 import com.bzw.api.module.basic.model.*;
 import com.bzw.api.module.basic.param.OrderParam;
-import com.bzw.api.module.platform.model.User;
+import com.bzw.api.module.basic.model.User;
 import com.bzw.common.sequence.SeqType;
 import com.bzw.common.sequence.SequenceService;
 import com.google.common.base.Preconditions;
@@ -142,12 +142,12 @@ public class OrderEventService {
         Map<Long, Technician> mapTechnician = Maps.newHashMap();
         if (!CollectionUtils.isEmpty(technicians)) {
             for (Technician technician : technicians) {
-                mapTechnician.put(technician.getId(), technician);
                 if (technician.getBizStatusId().equals(TechnicianState.free.getValue())) {
                     technician.setBizStatusId(TechnicianState.booked.getValue());
-                } else if (technician.getBizStatusId().equals(TechnicianState.booked.getValue()) ||
-                        technician.getBizStatusId().equals(TechnicianState.serving.getValue())) {
+                    mapTechnician.put(technician.getId(), technician);
+                } else if (technician.getBizStatusId().equals(TechnicianState.serving.getValue())) {
                     technician.setBizStatusId(TechnicianState.servingAndBooked.getValue());
+                    mapTechnician.put(technician.getId(), technician);
                 }
             }
         }
@@ -221,10 +221,48 @@ public class OrderEventService {
         if (project == null) {
             return false;
         }
+
+        List<OrderDetail> orderDetails = orderQueryBiz.listOrderDetail(orderDetail.getOrderId());
+
+        List<Long> technicianIds = Lists.newArrayList();
+        for (OrderDetail orderDetail1 : orderDetails) {
+            technicianIds.add(orderDetail1.getTechnicianId());
+        }
+        List<Technician> technicians = technicianQueryBiz.listTechnicianByIds(technicianIds);
+        Map<Long, Technician> mapTechnician = Maps.newHashMap();
+        if (!CollectionUtils.isEmpty(technicianIds)) {
+            technicians.forEach(t -> mapTechnician.put(t.getId(), t));
+        }
+        int gotoServingTime = 3;
+        int max = project.getDuration() + gotoServingTime;
+        for (OrderDetail orderDetail1 : orderDetails) {
+            Technician technician1 = mapTechnician.get(orderDetail1.getTechnicianId());
+            if (technician1 != null && technician1.getOverTime() != null) {
+                if (technician1.getBizStatusId().equals(TechnicianState.servingAndBooked.getValue()) &&
+                        !technician1.getOrderDetailId().equals(orderDetailId)) {
+                    Long minutes = (technician1.getOverTime().getTime() - now.getTime()) / (1000 * 60);
+                    int totalMinute = orderDetail1.getDuration() + gotoServingTime + minutes.intValue();
+                    if (totalMinute > max) {
+                        max = totalMinute;
+                    }
+                }
+            }
+        }
         room.setBizStatusId(RoomState.unfinished.getValue());
+        if (room.getStartTime() == null) {
+            room.setStartTime(now);
+        }
+        Date overTime = DateUtils.addMinutes(now, project.getDuration());
+        room.setOverTime(DateUtils.addMinutes(now, max));
         technician.setBizStatusId(TechnicianState.serving.getValue());
+        technician.setStartTime(now);
+        technician.setOverTime(overTime);
+        technician.setRoomId(room.getId());
+        technician.setRoomName(room.getNumber());
         orderDetail.setBeginTime(now);
-        orderDetail.setEndTime(DateUtils.addMinutes(now, project.getDuration()));
+        orderDetail.setEndTime(overTime);
+        orderDetail.setRoomId(room.getId());
+        orderDetail.setRoomName(room.getNumber());
         roomEventBiz.update(room);
         technicianEventBiz.updateTechnician(technician);
         orderEventBiz.updateOrderDetail(orderDetail);

@@ -18,6 +18,24 @@ public class TechnicianDTO {
     private Integer praise;
     private Integer orderCount;
     private Date overTime;
+    private Long roomId;
+    private String roomName;
+
+    public Long getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(Long roomId) {
+        this.roomId = roomId;
+    }
+
+    public String getRoomName() {
+        return roomName;
+    }
+
+    public void setRoomName(String roomName) {
+        this.roomName = roomName;
+    }
 
     public Integer getOrderCount() {
         return orderCount;

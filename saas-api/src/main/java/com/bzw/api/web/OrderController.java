@@ -73,7 +73,7 @@ public class OrderController extends BaseController {
     }
 
     @RequestMapping(value = "detail/{detailId}/serve", method = {RequestMethod.POST, RequestMethod.OPTIONS})
-    @ApiMethodAttribute(nonSignatureValidation = true)
+    @ApiMethodAttribute(nonSignatureValidation = true,nonSessionValidation = true)
     public Object serve(@PathVariable Long detailId) {
         return wrapperJsonView(orderEventService.serve(detailId));
     }

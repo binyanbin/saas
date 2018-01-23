@@ -83,9 +83,15 @@ public class UserController extends BaseController {
         return wrapperJsonView(wechatService.getOpenId(jscode));
     }
 
+    @RequestMapping(value = "openId/{openId}/orders")
+    @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
+    public Object listOrderByOpenId(@PathVariable String openId) {
+        return wrapperJsonView(customerQueryService.listOrderByOpenId(openId));
+    }
+
     @RequestMapping(value = "/{userId}/orders")
     @ApiMethodAttribute(nonSignatureValidation = true, nonSessionValidation = true)
-    public Object modify(@PathVariable Long userId) {
+    public Object listOrderByUserId(@PathVariable Long userId) {
         return wrapperJsonView(customerQueryService.listOrderByUserId(userId));
     }
 

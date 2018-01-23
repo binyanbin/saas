@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+/**
+ * @author yanbin
+ */
 @Service
 public class OrderQueryBiz {
 
@@ -38,6 +40,12 @@ public class OrderQueryBiz {
     public List<Order> listOrderByUserId(Long userId){
         OrderExample orderExample = new OrderExample();
         orderExample.createCriteria().andUserIdEqualTo(userId);
+        return orderMapper.selectByExample(orderExample);
+    }
+
+    public List<Order> listOrderByOpenId(String openId){
+        OrderExample orderExample = new OrderExample();
+        orderExample.createCriteria().andWechatIdEqualTo(openId);
         return orderMapper.selectByExample(orderExample);
     }
 

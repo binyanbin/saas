@@ -1,8 +1,8 @@
 package com.bzw.api.module.basic.biz;
 
-import com.bzw.api.module.platform.dao.UserMapper;
-import com.bzw.api.module.platform.model.User;
-import com.bzw.api.module.platform.model.UserExample;
+import com.bzw.api.module.basic.dao.UserMapper;
+import com.bzw.api.module.basic.model.User;
+import com.bzw.api.module.basic.model.UserExample;
 import com.bzw.common.enums.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

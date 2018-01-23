@@ -7,7 +7,6 @@ import com.bzw.api.module.basic.enums.ProjectType;
 import com.bzw.api.module.basic.enums.RoomState;
 import com.bzw.api.module.basic.enums.TechnicianState;
 import com.bzw.api.module.basic.model.*;
-import com.bzw.api.module.platform.model.User;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,34 +51,43 @@ public class CustomerQueryService {
         }
     }
 
-    public Boolean containPhone(String phone){
+    public Boolean containPhone(String phone) {
         List<User> users = userQueryBiz.listUserByPhone(phone);
         return !CollectionUtils.isEmpty(users);
     }
 
     public List<ProjectDTO> listProjectsByBranchId(Long branchId) {
         List<Project> projectList = projectQueryBiz.listProjectByBranchId(branchId);
-        return mapToProjectDto(projectList);
+        return mapToProjectDtoList(projectList);
+    }
+
+    public ProjectDTO getProject(Integer projectId) {
+        return mapToProjectDto(projectQueryBiz.getProject(projectId));
     }
 
     public List<ProjectDTO> listProjectsByRoomId(Long roomId) {
         List<Project> projectList = projectQueryBiz.listProjectsByRoomId(roomId);
-        return mapToProjectDto(projectList);
+        return mapToProjectDtoList(projectList);
     }
 
-    private List<ProjectDTO> mapToProjectDto(List<Project> projectList) {
+    private List<ProjectDTO> mapToProjectDtoList(List<Project> projectList) {
         List<ProjectDTO> result = Lists.newArrayList();
         for (Project project : projectList) {
-            ProjectDTO projectDTO = new ProjectDTO();
-            projectDTO.setId(project.getId());
-            projectDTO.setName(project.getName());
-            projectDTO.setTypeName(ProjectType.parse(project.getType()).getDesc());
-            projectDTO.setTypeId(project.getType());
-            projectDTO.setPrice(project.getPrice());
-            projectDTO.setDuration(project.getDuration());
-            result.add(projectDTO);
+            result.add(mapToProjectDto(project));
         }
         return result;
+    }
+
+    private ProjectDTO mapToProjectDto(Project project) {
+        ProjectDTO projectDTO = new ProjectDTO();
+        projectDTO.setId(project.getId());
+        projectDTO.setName(project.getName());
+        projectDTO.setTypeName(ProjectType.parse(project.getType()).getDesc());
+        projectDTO.setTypeId(project.getType());
+        projectDTO.setPrice(project.getPrice());
+        projectDTO.setDuration(project.getDuration());
+        projectDTO.setDescription(project.getDescription());
+        return projectDTO;
     }
 
     public RoomDTO getRoom(Long roomId) {
@@ -89,22 +97,22 @@ public class CustomerQueryService {
 
     public List<RoomDTO> listRoomsByBranchId(Long branchId) {
         List<Room> rooms = roomQueryBiz.listRoomByBranchId(branchId);
-        return mapToRoomDTOs(rooms);
+        return mapToRoomDtoList(rooms);
     }
 
-    public List<RoomDTO> listRoomsByBranchId(Long branchId,Integer projectId) {
+    public List<RoomDTO> listRoomsByBranchId(Long branchId, Integer projectId) {
         Project project = projectQueryBiz.getProject(projectId);
-        List<Room> rooms = roomQueryBiz.listRoomByBranchId(branchId,project.getType());
-        return mapToRoomDTOs(rooms);
+        List<Room> rooms = roomQueryBiz.listRoomByBranchId(branchId, project.getType());
+        return mapToRoomDtoList(rooms);
     }
 
 
     public List<RoomDTO> listRoomByProjectId(Integer projectId) {
         List<Room> rooms = roomQueryBiz.listRoomByProjectId(projectId);
-        return mapToRoomDTOs(rooms);
+        return mapToRoomDtoList(rooms);
     }
 
-    private List<RoomDTO> mapToRoomDTOs(List<Room> rooms) {
+    private List<RoomDTO> mapToRoomDtoList(List<Room> rooms) {
         List<RoomDTO> result = Lists.newArrayList();
         for (Room room : rooms) {
             result.add(mapToRoomDto(room));
@@ -112,7 +120,7 @@ public class CustomerQueryService {
         return result;
     }
 
-    private RoomDTO mapToRoomDto(Room room){
+    private RoomDTO mapToRoomDto(Room room) {
         RoomDTO roomDTO = new RoomDTO();
         roomDTO.setId(room.getId());
         roomDTO.setName(room.getNumber());
@@ -134,6 +142,13 @@ public class CustomerQueryService {
 
     public List<TechnicianDTO> listTechnicianByBranchId(Long branchId, int sort) {
         List<Technician> technicians = technicianQueryBiz.listTechnicianByBranchId(branchId, sort);
+        List<Long> orderDetailIds = Lists.newArrayList();
+        Map<Long, Technician> mapTechniican = Maps.newHashMap();
+        for (Technician technician : technicians) {
+            if (technician.getOrderDetailId() != null) {
+                orderDetailIds.add(technician.getOrderDetailId());
+            }
+        }
         return mapToTechnicianDto(technicians);
     }
 
@@ -152,6 +167,8 @@ public class CustomerQueryService {
             technicianDTO.setPraise(technician.getPraise());
             technicianDTO.setOrderCount(technician.getOrderCount());
             technicianDTO.setOverTime(technician.getOverTime());
+            technicianDTO.setRoomId(technician.getRoomId());
+            technicianDTO.setRoomName(technician.getRoomName());
             result.add(technicianDTO);
         }
         return result;
@@ -208,7 +225,7 @@ public class CustomerQueryService {
 
     public OrderDTO getOrderByRoomId(Long roomId) {
         Room room = roomQueryBiz.getRoom(roomId);
-        if (room.getOrderId() != null && room.getOrderId() > 0L) {
+        if (room != null && room.getOrderId() != null) {
             return getOrder(room.getOrderId());
         } else {
             return null;
@@ -216,11 +233,23 @@ public class CustomerQueryService {
     }
 
     public List<OrderDTO> listOrderByUserId(Long userId) {
-        List<OrderDTO> result = Lists.newArrayList();
         List<Order> orders = orderQueryBiz.listOrderByUserId(userId);
         if (CollectionUtils.isEmpty(orders)) {
-            return result;
+            return Lists.newArrayList();
         }
+        return getListOrderDTO(orders);
+    }
+
+    public List<OrderDTO> listOrderByOpenId(String openId) {
+        List<Order> orders = orderQueryBiz.listOrderByOpenId(openId);
+        if (CollectionUtils.isEmpty(orders)) {
+            return Lists.newArrayList();
+        }
+        return getListOrderDTO(orders);
+    }
+
+    private List<OrderDTO> getListOrderDTO(List<Order> orders) {
+        List<OrderDTO> result = Lists.newArrayList();
         List<Long> orderIds = Lists.newArrayList();
         for (Order order : orders) {
             orderIds.add(order.getId());

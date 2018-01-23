@@ -29,4 +29,10 @@ public class ProjectController extends BaseController {
         return wrapperJsonView(customerQueryService.listRoomByProjectId(projectId));
     }
 
+    @RequestMapping("/{projectId}")
+    @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
+    public Object getProject(@PathVariable Integer projectId){
+        return wrapperJsonView(customerQueryService.getProject(projectId));
+    }
+
 }

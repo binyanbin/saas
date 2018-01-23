@@ -1,5 +1,8 @@
 package com.bzw.api.module.basic.param;
 
+/**
+ * @author yanbin
+ */
 public class WechatTemplateData {
 
     private Keyword keyword1;

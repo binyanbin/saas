@@ -12,6 +12,15 @@ public class ProjectDTO {
     private Integer typeId;
     private BigDecimal price;
     private Integer duration;
+    private String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public Integer getDuration() {
         return duration;

@@ -5,7 +5,7 @@ import com.bzw.api.module.basic.enums.RoleType;
 import com.bzw.api.module.basic.model.Branch;
 import com.bzw.api.module.basic.model.Employee;
 import com.bzw.api.module.basic.model.Tenant;
-import com.bzw.api.module.platform.model.User;
+import com.bzw.api.module.basic.model.User;
 import com.bzw.common.cache.CacheKeyPrefix;
 import com.bzw.common.cache.ICacheClient;
 import com.bzw.common.content.WebSession;
