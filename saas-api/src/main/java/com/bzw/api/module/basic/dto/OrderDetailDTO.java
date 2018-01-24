@@ -7,6 +7,7 @@ import java.util.Date;
  * @author yanbin
  */
 public class OrderDetailDTO {
+    private Long id;
     private Long roomId;
     private String roomName;
     private Date bookTime;
@@ -15,6 +16,14 @@ public class OrderDetailDTO {
     private BigDecimal price;
     private Integer projectId;
     private String projectName;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Long getRoomId() {
         return roomId;

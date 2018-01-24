@@ -3,7 +3,7 @@ package com.bzw.api.web;
 import com.bzw.api.module.basic.service.CustomerEventService;
 import com.bzw.api.module.basic.service.CustomerQueryService;
 import com.bzw.api.module.basic.service.RoomEventService;
-import com.bzw.api.module.basic.service.WechatService;
+import com.bzw.api.module.basic.service.WeChatService;
 import com.bzw.common.content.ApiMethodAttribute;
 import com.bzw.common.utils.WebUtils;
 import com.bzw.common.web.BaseController;
@@ -40,7 +40,7 @@ public class RoomController extends BaseController {
     RoomEventService roomEventService;
 
     @Autowired
-    WechatService wechatService;
+    WeChatService weChatService;
 
     @RequestMapping("/{roomId}/branch")
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
@@ -87,10 +87,10 @@ public class RoomController extends BaseController {
     @RequestMapping(value = "{roomId}/qrcode", method = {RequestMethod.GET})
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
     public void qrCode(@PathVariable Long roomId, HttpServletResponse response) throws IOException {
-        String accessToken = wechatService.getAccessToken();
+        String accessToken = weChatService.getAccessToken();
         response.setContentType("image/png");
         OutputStream stream = response.getOutputStream();
-        stream.write(wechatService.getGrCode("pages/projectlist/projectlist", accessToken, "room_" + roomId.toString()));
+        stream.write(weChatService.getGrCode( accessToken, "room_" + roomId.toString()));
         stream.flush();
         stream.close();
     }

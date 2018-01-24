@@ -1,10 +1,11 @@
 package com.bzw.api.module.basic.service;
 
+import com.bzw.api.module.basic.constant.SmsConstants;
+import com.bzw.api.module.basic.constant.ExternalURL;
 import com.bzw.common.cache.CacheKeyPrefix;
 import com.bzw.common.cache.ICacheClient;
 import com.bzw.common.utils.HttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
@@ -22,14 +23,8 @@ import java.util.Random;
 @Service
 public class SmsService {
 
-    @Value("${sms.account}")
-    private String account;
-
-    @Value("${sms.secret}")
-    private String secret;
-
-    @Value("${sms.chanel}")
-    private String chanel;
+    @Autowired
+    private SmsConstants smsConstants;
 
     @Autowired
     private ICacheClient cacheClient;
@@ -37,7 +32,7 @@ public class SmsService {
     public Boolean sendSms(String phone) throws IOException, ParserConfigurationException, SAXException {
         String code = getRandomNum();
         String content = "验证码:" + code;
-        String url = String.format("http://smsapi.c123.cn/OpenPlatform/OpenApi?action=sendOnce&ac=%s&authkey=%s&cgid=%s&csid=&c=%s&m=%s", account, secret, chanel, content, phone);
+        String url = String.format(ExternalURL.SMS_URL, smsConstants.getAccount(), smsConstants.getSecret(), smsConstants.getChanel(), content, phone);
         String result = HttpClient.get(url);
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();

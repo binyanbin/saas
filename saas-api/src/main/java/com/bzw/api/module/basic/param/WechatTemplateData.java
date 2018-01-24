@@ -3,13 +3,20 @@ package com.bzw.api.module.basic.param;
 /**
  * @author yanbin
  */
-public class WechatTemplateData {
+public class WeChatTemplateData {
 
     private Keyword keyword1;
     private Keyword keyword2;
     private Keyword keyword3;
     private Keyword keyword4;
     private static final String COLOR = "#173177";
+
+    public WeChatTemplateData(){
+        keyword1 = new Keyword();
+        keyword2 = new Keyword();
+        keyword3 = new Keyword();
+        keyword4 = new Keyword();
+    }
 
     public Keyword getKeyword1() {
         return keyword1;

@@ -142,14 +142,11 @@ public class CustomerQueryService {
 
     public List<TechnicianDTO> listTechnicianByBranchId(Long branchId, int sort) {
         List<Technician> technicians = technicianQueryBiz.listTechnicianByBranchId(branchId, sort);
-        List<Long> orderDetailIds = Lists.newArrayList();
-        Map<Long, Technician> mapTechniican = Maps.newHashMap();
-        for (Technician technician : technicians) {
-            if (technician.getOrderDetailId() != null) {
-                orderDetailIds.add(technician.getOrderDetailId());
-            }
-        }
         return mapToTechnicianDto(technicians);
+    }
+
+    public List<Technician> listTechnicianByIds(List<Long> ids){
+        return technicianQueryBiz.listTechnicianByIds(ids);
     }
 
     private List<TechnicianDTO> mapToTechnicianDto(List<Technician> technicians) {
@@ -217,9 +214,7 @@ public class CustomerQueryService {
         result.setBranchName(orderDetails.get(0).getBranchName());
         result.setPrice(order.getPrice());
         result.setId(order.getId());
-        List<OrderDetailDTO> detailDTOList = Lists.newArrayList();
-        mapToOrderDetailDto(orderDetails, detailDTOList);
-        result.setDetails(detailDTOList);
+        result.setDetails(mapToOrderDetailDto(orderDetails));
         return result;
     }
 
@@ -230,6 +225,10 @@ public class CustomerQueryService {
         } else {
             return null;
         }
+    }
+
+    public List<OrderDetailDTO> listOrderDetail(Long orderId) {
+        return mapToOrderDetailDto(orderQueryBiz.listOrderDetail(orderId));
     }
 
     public List<OrderDTO> listOrderByUserId(Long userId) {
@@ -275,17 +274,17 @@ public class CustomerQueryService {
             orderDTO.setBranchName(orderDetails.get(0).getBranchName());
             orderDTO.setPrice(order.getPrice());
             List<OrderDetail> orderDetailList = mapOrderDetail.get(order.getId());
-            List<OrderDetailDTO> detailDTOList = Lists.newArrayList();
-            mapToOrderDetailDto(orderDetailList, detailDTOList);
-            orderDTO.setDetails(detailDTOList);
+            orderDTO.setDetails(mapToOrderDetailDto(orderDetailList));
             result.add(orderDTO);
         }
         return result;
     }
 
-    private void mapToOrderDetailDto(List<OrderDetail> orderDetails, List<OrderDetailDTO> detailDTOList) {
+    private List<OrderDetailDTO> mapToOrderDetailDto(List<OrderDetail> orderDetails) {
+        List<OrderDetailDTO> detailDTOList = Lists.newArrayList();
         for (OrderDetail orderDetail : orderDetails) {
             OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
+            orderDetailDTO.setId(orderDetail.getId());
             orderDetailDTO.setBookTime(orderDetail.getBookTime());
             orderDetailDTO.setPrice(orderDetail.getPrice());
             orderDetailDTO.setProjectId(orderDetail.getProjectId());
@@ -296,6 +295,7 @@ public class CustomerQueryService {
             orderDetailDTO.setTechnicianName(orderDetail.getTechnicianName());
             detailDTOList.add(orderDetailDTO);
         }
+        return detailDTOList;
     }
 
 }

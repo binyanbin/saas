@@ -4,7 +4,7 @@ import com.bzw.api.module.basic.param.LoginParam;
 import com.bzw.api.module.basic.service.CustomerEventService;
 import com.bzw.api.module.basic.service.CustomerQueryService;
 import com.bzw.api.module.basic.service.SmsService;
-import com.bzw.api.module.basic.service.WechatService;
+import com.bzw.api.module.basic.service.WeChatService;
 import com.bzw.common.content.ApiMethodAttribute;
 import com.bzw.common.exception.api.UserLoginFailException;
 import com.bzw.common.utils.WebUtils;
@@ -31,7 +31,7 @@ public class UserController extends BaseController {
     private CustomerQueryService customerQueryService;
 
     @Autowired
-    private WechatService wechatService;
+    private WeChatService weChatService;
 
     @Autowired
     private SmsService smsService;
@@ -64,7 +64,7 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/login/code/{jscode}", method = {RequestMethod.OPTIONS, RequestMethod.POST})
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
     public Object codeLogin(@PathVariable String jscode) {
-        String openId = wechatService.getOpenId(jscode);
+        String openId = weChatService.getOpenId(jscode);
         if (null == openId) {
             throw new UserLoginFailException();
         }
@@ -74,14 +74,9 @@ public class UserController extends BaseController {
     @RequestMapping(value = "openId/{jscode}")
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
     public Object accessToken(@PathVariable String jscode) {
-        return wrapperJsonView(wechatService.getOpenId(jscode));
+        return wrapperJsonView(weChatService.getOpenId(jscode));
     }
 
-    @RequestMapping(value = "wechat/openId/{jscode}")
-    @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
-    public Object getOpenId(@PathVariable String jscode) {
-        return wrapperJsonView(wechatService.getOpenId(jscode));
-    }
 
     @RequestMapping(value = "openId/{openId}/orders")
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
