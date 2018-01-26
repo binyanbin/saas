@@ -1,9 +1,6 @@
 package com.bzw.api.web;
 
-import com.bzw.api.module.basic.service.CustomerEventService;
-import com.bzw.api.module.basic.service.CustomerQueryService;
-import com.bzw.api.module.basic.service.RoomEventService;
-import com.bzw.api.module.basic.service.WeChatService;
+import com.bzw.api.module.basic.service.*;
 import com.bzw.common.content.ApiMethodAttribute;
 import com.bzw.common.utils.WebUtils;
 import com.bzw.common.web.BaseController;
@@ -31,16 +28,22 @@ public class RoomController extends BaseController {
     private String secret;
 
     @Autowired
-    CustomerQueryService customerQueryService;
+    private CustomerQueryService customerQueryService;
 
     @Autowired
-    CustomerEventService customerEventService;
+    private CustomerEventService customerEventService;
 
     @Autowired
-    RoomEventService roomEventService;
+    private RoomEventService roomEventService;
 
     @Autowired
-    WeChatService weChatService;
+    private WcService wcService;
+
+    @Autowired
+    private OrderQueryService orderQueryService;
+
+    @Autowired
+    private RoomQueryService roomQueryService;
 
     @RequestMapping("/{roomId}/branch")
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
@@ -57,13 +60,13 @@ public class RoomController extends BaseController {
     @RequestMapping("/{roomId}")
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
     public Object getRoom(@PathVariable Long roomId) {
-        return wrapperJsonView(customerQueryService.getRoom(roomId));
+        return wrapperJsonView(roomQueryService.getRoom(roomId));
     }
 
     @RequestMapping("/{roomId}/order")
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
     public Object getOrder(@PathVariable Long roomId) {
-        return wrapperJsonView(customerQueryService.getOrderByRoomId(roomId));
+        return wrapperJsonView(orderQueryService.getOrderByRoomId(roomId));
     }
 
     @RequestMapping(value = "/{roomId}/book", method = {RequestMethod.POST, RequestMethod.OPTIONS})
@@ -87,13 +90,11 @@ public class RoomController extends BaseController {
     @RequestMapping(value = "{roomId}/qrcode", method = {RequestMethod.GET})
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
     public void qrCode(@PathVariable Long roomId, HttpServletResponse response) throws IOException {
-        String accessToken = weChatService.getAccessToken();
+        String accessToken = wcService.getAccessToken();
         response.setContentType("image/png");
         OutputStream stream = response.getOutputStream();
-        stream.write(weChatService.getGrCode( accessToken, "room_" + roomId.toString()));
+        stream.write(wcService.getGrCode( accessToken, "room_" + roomId.toString()));
         stream.flush();
         stream.close();
     }
-
-
 }

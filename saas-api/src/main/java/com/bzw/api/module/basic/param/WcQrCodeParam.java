@@ -3,7 +3,7 @@ package com.bzw.api.module.basic.param;
 /**
  * @author yanbin
  */
-public class WeChatQrCodeParam {
+public class WcQrCodeParam {
     private String scene;
     private String page;
 

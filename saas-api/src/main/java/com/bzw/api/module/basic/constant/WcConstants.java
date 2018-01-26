@@ -3,8 +3,11 @@ package com.bzw.api.module.basic.constant;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+/**
+ * @author yanbin
+ */
 @Service
-public class WeChatConstants {
+public class WcConstants {
 
     @Value("${wechat.appid}")
     private String appid;

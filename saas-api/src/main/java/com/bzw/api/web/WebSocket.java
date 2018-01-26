@@ -2,7 +2,6 @@ package com.bzw.api.web;
 
 import com.google.common.collect.Maps;
 import org.springframework.stereotype.Component;
-
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
@@ -40,9 +39,19 @@ public class WebSocket {
 
     @OnClose
     public void onClose() {
-        webSocketMap.remove(this);
-        subOnlineCount();
-        System.out.println("有一链接关闭!当前在线人数为" + getOnlineCount());
+        String[] queryParams = session.getQueryString().split("=");
+        if (queryParams.length >= 2) {
+            webSocketMap.remove(queryParams[0]);
+            subOnlineCount();
+            System.out.println("有一链接关闭!当前在线人数为" + getOnlineCount());
+        } else {
+            for (Map.Entry<String, WebSocket> entry : webSocketMap.entrySet()) {
+                if (entry.getValue().equals(this)) {
+                    webSocketMap.remove(entry.getKey());
+                    break;
+                }
+            }
+        }
     }
 
     @OnMessage
@@ -50,10 +59,14 @@ public class WebSocket {
         System.out.println("来自客户端的消息:" + message);
     }
 
-    public static void sendMessage(String key, String message) throws IOException {
+    public static void sendMessage(String key, String message) {
         WebSocket socket = webSocketMap.get(key);
-        if (socket!=null) {
-            socket.sendMessage(message);
+        if (socket != null) {
+            try {
+                socket.sendMessage(message);
+            } catch (IOException ex) {
+                webSocketMap.remove(key);
+            }
         }
     }
 

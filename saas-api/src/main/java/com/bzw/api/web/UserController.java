@@ -1,10 +1,7 @@
 package com.bzw.api.web;
 
 import com.bzw.api.module.basic.param.LoginParam;
-import com.bzw.api.module.basic.service.CustomerEventService;
-import com.bzw.api.module.basic.service.CustomerQueryService;
-import com.bzw.api.module.basic.service.SmsService;
-import com.bzw.api.module.basic.service.WeChatService;
+import com.bzw.api.module.basic.service.*;
 import com.bzw.common.content.ApiMethodAttribute;
 import com.bzw.common.exception.api.UserLoginFailException;
 import com.bzw.common.utils.WebUtils;
@@ -31,7 +28,10 @@ public class UserController extends BaseController {
     private CustomerQueryService customerQueryService;
 
     @Autowired
-    private WeChatService weChatService;
+    private OrderQueryService orderQueryService;
+
+    @Autowired
+    private WcService wcService;
 
     @Autowired
     private SmsService smsService;
@@ -64,7 +64,7 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/login/code/{jscode}", method = {RequestMethod.OPTIONS, RequestMethod.POST})
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
     public Object codeLogin(@PathVariable String jscode) {
-        String openId = weChatService.getOpenId(jscode);
+        String openId = wcService.getOpenId(jscode);
         if (null == openId) {
             throw new UserLoginFailException();
         }
@@ -74,20 +74,20 @@ public class UserController extends BaseController {
     @RequestMapping(value = "openId/{jscode}")
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
     public Object accessToken(@PathVariable String jscode) {
-        return wrapperJsonView(weChatService.getOpenId(jscode));
+        return wrapperJsonView(wcService.getOpenId(jscode));
     }
 
 
     @RequestMapping(value = "openId/{openId}/orders")
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
     public Object listOrderByOpenId(@PathVariable String openId) {
-        return wrapperJsonView(customerQueryService.listOrderByOpenId(openId));
+        return wrapperJsonView(orderQueryService.listOrderByOpenId(openId));
     }
 
     @RequestMapping(value = "/{userId}/orders")
     @ApiMethodAttribute(nonSignatureValidation = true, nonSessionValidation = true)
     public Object listOrderByUserId(@PathVariable Long userId) {
-        return wrapperJsonView(customerQueryService.listOrderByUserId(userId));
+        return wrapperJsonView(orderQueryService.listOrderByUserId(userId));
     }
 
     @RequestMapping(value = "/bind/{openId}", method = {RequestMethod.OPTIONS, RequestMethod.POST})

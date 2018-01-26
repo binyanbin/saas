@@ -4,12 +4,16 @@ import com.bzw.api.module.basic.biz.*;
 import com.bzw.api.module.basic.enums.*;
 import com.bzw.api.module.basic.model.*;
 import com.bzw.api.module.basic.param.OrderParam;
-import com.bzw.api.module.basic.model.User;
+import com.bzw.api.module.basic.param.PushClientParam;
+import com.bzw.api.module.basic.param.PushTechnicianParam;
+import com.bzw.api.web.WebSocket;
 import com.bzw.common.sequence.SeqType;
 import com.bzw.common.sequence.SequenceService;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,6 +56,9 @@ public class OrderEventService {
 
     @Autowired
     private TechnicianEventBiz technicianEventBiz;
+
+    @Autowired
+    private Gson gson;
 
     public Long addOrderForDesk(List<OrderParam> orderParams, Long userId, Long roomId) {
         Room room = roomQueryBiz.getRoom(roomId);
@@ -154,6 +161,7 @@ public class OrderEventService {
 
         BigDecimal totalPrice = new BigDecimal(0);
         List<OrderDetail> orderDetails = Lists.newArrayList();
+        List<PushTechnicianParam> pushTechnicianParams = Lists.newArrayList();
         for (int i = 0; i < orderParams.size(); i++) {
             if (mapProject.containsKey(orderParams.get(i).getProjectId()) &&
                     mapTechnician.containsKey(orderParams.get(i).getTechnicianId())) {
@@ -178,6 +186,16 @@ public class OrderEventService {
                 orderDetail.setDuration(project.getDuration());
                 orderDetails.add(orderDetail);
                 totalPrice = totalPrice.add(project.getPrice());
+                PushTechnicianParam pushTechnicianParam = new PushTechnicianParam();
+                pushTechnicianParam.setDetailId(orderDetail.getId());
+                pushTechnicianParam.setTechnicianName(technician.getName());
+                pushTechnicianParam.setRoomId(room.getId());
+                pushTechnicianParam.setRoomName(room.getNumber());
+                pushTechnicianParam.setProjectId(project.getId());
+                pushTechnicianParam.setProjectName(project.getName());
+                pushTechnicianParam.setTechnicianId(technician.getId());
+                pushTechnicianParam.setTxt("请技师"+technician.getName()+"去"+room.getNumber()+"上钟");
+                pushTechnicianParams.add(pushTechnicianParam);
             }
         }
         order.setPrice(totalPrice);
@@ -197,29 +215,32 @@ public class OrderEventService {
         room.setBizStatusId(RoomState.waiting.getValue());
         roomEventBiz.update(room);
         technicianEventBiz.updateList(technicians);
+        String message = gson.toJson(pushTechnicianParams);
+        WebSocket.sendMessage(branchId.toString(),message);
         return order.getId();
     }
 
 
-    public boolean serve(Long orderDetailId) {
+    public OrderDetail serve(Long orderDetailId) {
         Date now = new Date();
         OrderDetail orderDetail = orderQueryBiz.getOrderDetail(orderDetailId);
         if (orderDetail == null) {
-            return false;
+            return null;
         }
+        Order order = orderQueryBiz.getOrder(orderDetail.getOrderId());
         Technician technician = technicianQueryBiz.getTechnicianById(orderDetail.getTechnicianId());
         if (technician == null) {
-            return false;
+            return null;
         }
         Preconditions.checkArgument(technician.getBizStatusId().equals(TechnicianState.free.getValue()) ||
                 technician.getBizStatusId().equals(TechnicianState.booked.getValue()), "服务未结束不能上钟");
         Room room = roomQueryBiz.getRoom(orderDetail.getRoomId());
         if (room == null) {
-            return false;
+            return null;
         }
         Project project = projectQueryBiz.getProject(orderDetail.getProjectId());
         if (project == null) {
-            return false;
+            return null;
         }
 
         List<OrderDetail> orderDetails = orderQueryBiz.listOrderDetail(orderDetail.getOrderId());
@@ -266,6 +287,18 @@ public class OrderEventService {
         roomEventBiz.update(room);
         technicianEventBiz.updateTechnician(technician);
         orderEventBiz.updateOrderDetail(orderDetail);
-        return true;
+        if (StringUtils.isNotBlank(order.getWechatId())) {
+            PushClientParam pushClientParam = new PushClientParam();
+            pushClientParam.setProjectId(project.getId());
+            pushClientParam.setProjectName(project.getName());
+            pushClientParam.setRoomId(room.getId());
+            pushClientParam.setRoomName(room.getNumber());
+            pushClientParam.setTechnicianId(technician.getId());
+            pushClientParam.setTechnicianName(technician.getName());
+            pushClientParam.setOrderDetailId(orderDetailId);
+            String message = gson.toJson(pushClientParam);
+            WebSocket.sendMessage(order.getWechatId(), message);
+        }
+        return orderDetail;
     }
 }

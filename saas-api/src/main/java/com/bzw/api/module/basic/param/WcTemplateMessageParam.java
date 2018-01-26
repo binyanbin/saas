@@ -3,18 +3,18 @@ package com.bzw.api.module.basic.param;
 /**
  * @author yanbin
  */
-public class WeChatTemplateMessageParam {
+public class WcTemplateMessageParam {
     private String touser;
     private String template_id;
     private String page;
     private String form_id;
-    private WeChatTemplateData data;
+    private WcTemplateData data;
 
-    public WeChatTemplateData getData() {
+    public WcTemplateData getData() {
         return data;
     }
 
-    public void setData(WeChatTemplateData data) {
+    public void setData(WcTemplateData data) {
         this.data = data;
     }
 

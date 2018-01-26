@@ -1,13 +1,13 @@
 package com.bzw.api.module.basic.service;
 
-import com.bzw.api.module.basic.constant.ExternalURL;
+import com.bzw.api.module.basic.constant.ExternalUrl;
 import com.bzw.api.module.basic.dto.WeChatAccessTokenDTO;
 import com.bzw.api.module.basic.dto.WeChatLoginDTO;
 import com.bzw.api.module.basic.dto.WeChatResult;
-import com.bzw.api.module.basic.constant.WeChatConstants;
-import com.bzw.api.module.basic.param.WeChatQrCodeParam;
-import com.bzw.api.module.basic.param.WeChatTemplateData;
-import com.bzw.api.module.basic.param.WeChatTemplateMessageParam;
+import com.bzw.api.module.basic.constant.WcConstants;
+import com.bzw.api.module.basic.param.WcQrCodeParam;
+import com.bzw.api.module.basic.param.WcTemplateData;
+import com.bzw.api.module.basic.param.WcTemplateMessageParam;
 import com.bzw.common.cache.RedisClient;
 import com.bzw.common.utils.HttpClient;
 import com.google.gson.Gson;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
  * @author yanbin
  */
 @Service
-public class WeChatService {
+public class WcService {
 
     @Autowired
     private Gson gson;
@@ -28,11 +28,10 @@ public class WeChatService {
     private RedisClient redisClient;
 
     @Autowired
-    WeChatConstants weChatConstants;
-
+    WcConstants wcConstants;
 
     public String getOpenId(String jscode) {
-        String url = String.format(ExternalURL.OPEN_ID_URL, weChatConstants.getAppid(), weChatConstants.getSecret(), jscode);
+        String url = String.format(ExternalUrl.OPEN_ID_URL, wcConstants.getAppid(), wcConstants.getSecret(), jscode);
         String body = HttpClient.get(url);
         if (StringUtils.isNotBlank(body)) {
             WeChatLoginDTO result = gson.fromJson(body, WeChatLoginDTO.class);
@@ -43,15 +42,15 @@ public class WeChatService {
     }
 
     public String getAccessToken() {
-        String cacheValue = redisClient.get(ExternalURL.WE_CHAT_KEY);
+        String cacheValue = redisClient.get(ExternalUrl.WE_CHAT_KEY);
         if (StringUtils.isNotBlank(cacheValue)) {
             return cacheValue;
         } else {
-            String url = String.format(ExternalURL.ACCESS_TOKEN_URL, weChatConstants.getAppid(), weChatConstants.getSecret());
+            String url = String.format(ExternalUrl.ACCESS_TOKEN_URL, wcConstants.getAppid(), wcConstants.getSecret());
             String body = HttpClient.get(url);
             if (StringUtils.isNotBlank(body)) {
                 WeChatAccessTokenDTO result = gson.fromJson(body, WeChatAccessTokenDTO.class);
-                redisClient.set(ExternalURL.WE_CHAT_KEY, result.getAccess_token(), result.getExpires_in());
+                redisClient.set(ExternalUrl.WE_CHAT_KEY, result.getAccess_token(), result.getExpires_in());
                 return result.getAccess_token();
             } else {
                 return null;
@@ -60,28 +59,28 @@ public class WeChatService {
     }
 
     public byte[] getGrCode(String accessToken, String scene) {
-        String url = String.format(ExternalURL.GR_CODE_URL, accessToken);
-        WeChatQrCodeParam param = new WeChatQrCodeParam();
-        param.setPage(ExternalURL.ROOM_PAGE);
+        String url = String.format(ExternalUrl.GR_CODE_URL, accessToken);
+        WcQrCodeParam param = new WcQrCodeParam();
+        param.setPage(ExternalUrl.ROOM_PAGE);
         param.setScene(scene);
-        String paramContent = gson.toJson(param, WeChatQrCodeParam.class);
+        String paramContent = gson.toJson(param, WcQrCodeParam.class);
         return HttpClient.postJson(url, paramContent);
     }
 
-    public void sendTemplateMessage(String openId, String formId, String time, String amount, String projectName,String queryString) {
+    public WeChatResult sendTemplateMessage(String openId, String formId, String time, String amount, String projectName,String queryString) {
         String accessToken = getAccessToken();
-        String url = String.format(ExternalURL.TEMPLATE_MESSAGE_URL, accessToken);
-        WeChatTemplateMessageParam param = new WeChatTemplateMessageParam();
-        param.setTemplate_id(weChatConstants.getBookId());
+        String url = String.format(ExternalUrl.TEMPLATE_MESSAGE_URL, accessToken);
+        WcTemplateMessageParam param = new WcTemplateMessageParam();
+        param.setTemplate_id(wcConstants.getBookId());
         param.setTouser(openId);
         param.setForm_id(formId);
-        param.setPage(ExternalURL.TECHNICIAN_MESSAGE_PAGE);
-        WeChatTemplateData data = new WeChatTemplateData();
+        param.setPage(ExternalUrl.TECHNICIAN_MESSAGE_PAGE);
+        WcTemplateData data = new WcTemplateData();
         data.setKeyword1(time);
         data.setKeyword2(amount);
         data.setKeyword3(projectName);
-        String paramContent = gson.toJson(param, WeChatTemplateMessageParam.class);
+        String paramContent = gson.toJson(param, WcTemplateMessageParam.class);
         String result = HttpClient.postJsonStr(url, paramContent);
-        gson.fromJson(result, WeChatResult.class);
+        return gson.fromJson(result, WeChatResult.class);
     }
 }

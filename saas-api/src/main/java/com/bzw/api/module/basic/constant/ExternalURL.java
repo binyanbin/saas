@@ -1,6 +1,9 @@
 package com.bzw.api.module.basic.constant;
 
-public class ExternalURL {
+/**
+ * @author yanbin
+ */
+public class ExternalUrl {
     public static final String ROOM_PAGE = "pages/projectlist/projectlist";
     public static final String TECHNICIAN_MESSAGE_PAGE = "pages/preview/preview";
     public static final String OPEN_ID_URL = "https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code";

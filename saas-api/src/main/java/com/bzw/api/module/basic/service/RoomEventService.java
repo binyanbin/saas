@@ -1,7 +1,7 @@
 package com.bzw.api.module.basic.service;
 
 import com.bzw.api.module.basic.biz.*;
-import com.bzw.api.module.basic.constant.ErrorMessages;
+import com.bzw.api.module.basic.constant.WarnMessage;
 import com.bzw.api.module.basic.enums.*;
 import com.bzw.api.module.basic.model.*;
 import com.bzw.common.sequence.ISequence;
@@ -54,9 +54,9 @@ public class RoomEventService {
      */
     public boolean open(Long roomId, Long employeeId) {
         Room room = roomQueryBiz.getRoom(roomId);
-        Preconditions.checkArgument(room != null, ErrorMessages.NOT_FOUND_ROOM);
+        Preconditions.checkArgument(room != null, WarnMessage.NOT_FOUND_ROOM);
         Preconditions.checkArgument(room.getBizStatusId().equals(RoomState.free.getValue()) ||
-                room.getBizStatusId().equals(RoomState.booked.getValue()), ErrorMessages.ROOM_USED);
+                room.getBizStatusId().equals(RoomState.booked.getValue()), WarnMessage.ROOM_USED);
         return updateRoomState(room, employeeId, RoomState.open.getValue());
     }
 
@@ -65,7 +65,7 @@ public class RoomEventService {
      */
     public boolean book(Long roomId, Long employeeId) {
         Room room = roomQueryBiz.getRoom(roomId);
-        Preconditions.checkArgument(room != null, ErrorMessages.NOT_FOUND_ROOM);
+        Preconditions.checkArgument(room != null, WarnMessage.NOT_FOUND_ROOM);
         Preconditions.checkArgument(room.getBizStatusId().equals(RoomState.free.getValue()), "房间已被预定或使用");
         return updateRoomState(room, employeeId, RoomState.booked.getValue());
     }
@@ -75,7 +75,7 @@ public class RoomEventService {
      */
     public boolean cancel(Long roomId, Long employeeId) {
         Room room = roomQueryBiz.getRoom(roomId);
-        Preconditions.checkArgument(room != null, ErrorMessages.NOT_FOUND_ROOM);
+        Preconditions.checkArgument(room != null, WarnMessage.NOT_FOUND_ROOM);
         Date now = new Date();
         Order order = orderQueryBiz.getOrder(room.getOrderId());
         List<OrderDetail> orderDetailList = orderQueryBiz.listOrderDetail(order.getId());

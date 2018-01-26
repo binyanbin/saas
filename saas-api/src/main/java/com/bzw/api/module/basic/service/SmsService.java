@@ -1,7 +1,7 @@
 package com.bzw.api.module.basic.service;
 
 import com.bzw.api.module.basic.constant.SmsConstants;
-import com.bzw.api.module.basic.constant.ExternalURL;
+import com.bzw.api.module.basic.constant.ExternalUrl;
 import com.bzw.common.cache.CacheKeyPrefix;
 import com.bzw.common.cache.ICacheClient;
 import com.bzw.common.utils.HttpClient;
@@ -32,7 +32,7 @@ public class SmsService {
     public Boolean sendSms(String phone) throws IOException, ParserConfigurationException, SAXException {
         String code = getRandomNum();
         String content = "验证码:" + code;
-        String url = String.format(ExternalURL.SMS_URL, smsConstants.getAccount(), smsConstants.getSecret(), smsConstants.getChanel(), content, phone);
+        String url = String.format(ExternalUrl.SMS_URL, smsConstants.getAccount(), smsConstants.getSecret(), smsConstants.getChanel(), content, phone);
         String result = HttpClient.get(url);
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
