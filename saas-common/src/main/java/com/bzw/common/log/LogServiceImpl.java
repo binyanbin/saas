@@ -119,7 +119,7 @@ public class LogServiceImpl implements ILogService {
             data.setUserId(MDC.get(Constants.USER_ID));
         }
         if (!StringUtils.isBlank(MDC.get(Constants.SESSION_ID))) {
-            data.setSessionId(MDC.get("sessionId"));
+            data.setSessionId(MDC.get(Constants.SESSION_ID));
         }
         mongoTemplate.insert(data);
     }

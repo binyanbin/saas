@@ -13,28 +13,23 @@ import javax.servlet.http.HttpServletRequest;
  * @author yanbin
  * @date 2017/7/1
  */
+
 public final class WebUtils {
 
     public static final class Http {
-        /**
-         * Get the request IP
-         *
-         * @param request
-         * @return
-         */
+
         public static String getIpAddr(HttpServletRequest request) {
-            String ip = "0.0.0.0";
-            ip = request.getHeader("x-forwarded-for");
+            String ip;
+            ip = request.getHeader(Constants.X_FORWARDED_FOR);
             if (isInvalidIP(ip)) {
-                ip = request.getHeader("Proxy-Client-IP");
+                ip = request.getHeader(Constants.PROXY_CLIENT_IP);
             }
             if (isInvalidIP(ip)) {
-                ip = request.getHeader("WL-Proxy-Client-IP");
+                ip = request.getHeader(Constants.WL_PROXY_CLIENT_IP);
             }
             if (isInvalidIP(ip)) {
                 ip = request.getRemoteAddr();
             }
-            // get X-real-ip from nginx
             if (isInvalidIP(ip)) {
                 ip = request.getHeader(Constants.X_REAL_IP);
             }
@@ -51,12 +46,6 @@ public final class WebUtils {
             return ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip) || "127.0.0.1".equals(ip);
         }
 
-        /**
-         * Get the basic path
-         *
-         * @param request
-         * @return
-         */
         public static String getBasePath(HttpServletRequest request) {
             String path = request.getContextPath();
             String basePath = request.getScheme() + "://"
@@ -65,12 +54,6 @@ public final class WebUtils {
             return basePath;
         }
 
-        /**
-         * Get the basic path haven't port
-         *
-         * @param request
-         * @return
-         */
         public static String getBasePathNotPort(HttpServletRequest request) {
             String path = request.getContextPath();
             String basePath = request.getScheme() + "://"
@@ -78,20 +61,13 @@ public final class WebUtils {
             return basePath;
         }
 
-        /**
-         * Get the context path
-         *
-         * @param request
-         * @return
-         */
         public static String getContextPath(HttpServletRequest request) {
-            String path = request.getContextPath();
-            return path;
+            return request.getContextPath();
         }
 
 
         public static String getUserAgent(HttpServletRequest request) {
-            return request.getHeader("user-agent");
+            return request.getHeader(Constants.USER_AGENT);
         }
 
         public static String getMethod(HttpServletRequest request) {
@@ -102,19 +78,13 @@ public final class WebUtils {
 
     public static final class Session {
 
-        private static final String SESSION_ID = "sessionId";
-        private static final String DEVICE_ID = "deviceId";
-
-        /**
-         * 获取会话ID。
-         */
         public static String getSessionId(HttpServletRequest request) {
-            String sessionId = request.getHeader(SESSION_ID);
+            String sessionId = request.getHeader(Constants.SESSION_ID);
             if (null == sessionId) {
                 Cookie[] cookies = request.getCookies();
                 if ((null != cookies) && (cookies.length > 0)) {
                     for (Cookie cook : cookies) {
-                        if (SESSION_ID.equals(cook.getName())) {
+                        if (Constants.SESSION_ID.equals(cook.getName())) {
                             sessionId = cook.getValue();
                             break;
                         }
@@ -131,7 +101,7 @@ public final class WebUtils {
         }
 
         public static String getDeviceId(HttpServletRequest request) {
-            return request.getHeader(DEVICE_ID);
+            return request.getHeader(Constants.DEVICE_ID);
         }
 
         public static WebSession get() {
@@ -142,13 +112,6 @@ public final class WebUtils {
             return null;
         }
 
-        public static void set(WebSession session) {
-            WebContext webContext = ThreadWebContextHolder.getContext();
-            if (null != webContext) {
-                webContext.setWebSession(session);
-                ThreadWebContextHolder.setContext(webContext);
-            }
-        }
 
         public static Long getUserId() {
             WebSession session = get();

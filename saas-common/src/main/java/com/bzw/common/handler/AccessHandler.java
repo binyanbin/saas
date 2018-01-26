@@ -39,7 +39,7 @@ public class AccessHandler implements HandlerInterceptor {
     private BeanFactory beanFactory;
 
     private long beginTime;
-    private static String SIGN_KEY = "sign";
+
 
     @Autowired
     public AccessHandler(WebSessionManager webSessionManager, LogServiceImpl logServiceImpl, BeanFactory beanFactory) {
@@ -51,19 +51,19 @@ public class AccessHandler implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         beginTime = System.currentTimeMillis();
-        MDC.put("ip", WebUtils.Http.getIpAddr(request));
+        MDC.put(Constants.IP, WebUtils.Http.getIpAddr(request));
         String userAgent = WebUtils.Http.getUserAgent(request);
-        MDC.put("profile", null == userAgent ? "EmptyUserAgent" : userAgent);
+        MDC.put(Constants.PROFILE, null == userAgent ? "EmptyUserAgent" : userAgent);
         if (StringUtils.isBlank(request.getRequestURI())) {
-            MDC.put("url", "none");
+            MDC.put(Constants.URL, "none");
         } else {
             String url = request.getRequestURI();
             if (StringUtils.isNotBlank(request.getQueryString())) {
                 url = url + "?" + request.getQueryString();
             }
-            MDC.put("url", url);
+            MDC.put(Constants.URL, url);
         }
-        MDC.put("method", WebUtils.Http.getMethod(request));
+        MDC.put(Constants.METHOD, WebUtils.Http.getMethod(request));
         WebContext webContext = buildWebContext(request, response, beanFactory);
         boolean nonSessionValidation = false;
         boolean nonSignValidaion = false;
@@ -85,7 +85,7 @@ public class AccessHandler implements HandlerInterceptor {
         }
         String sessionId = WebUtils.Session.getSessionId(request);
         if (!StringUtils.isBlank(sessionId)) {
-            MDC.put("sessionId", sessionId);
+            MDC.put(Constants.SESSION_ID, sessionId);
         }
         logServiceImpl.insertDaily();
         return true;
@@ -124,25 +124,18 @@ public class AccessHandler implements HandlerInterceptor {
     private void loggerUserInfo(WebSession webSession) {
         if (null != webSession) {
             if (null != webSession.getUserId()) {
-                MDC.put("userId", null == webSession.getUserId() ? ""
+                MDC.put(Constants.USER_ID, null == webSession.getUserId() ? ""
                         : webSession.getUserId().toString());
-            }
-            if (null != webSession.getName()) {
-                MDC.put("name", webSession.getName());
-            }
-            if (null != webSession.getEmployeeId()) {
-                MDC.put("employeeId", null == webSession.getEmployeeId() ? ""
-                        : webSession.getEmployeeId().toString());
             }
         }
     }
 
     private boolean validSign(HttpServletRequest request, boolean nonSessionValidation) {
-        if (StringUtils.isBlank(request.getParameter(SIGN_KEY))) {
+        if (StringUtils.isBlank(request.getParameter(Constants.SIGN_KEY))) {
             return false;
         }
         List<String> list = Collections.list(request.getParameterNames());
-        list.remove(SIGN_KEY);
+        list.remove(Constants.SIGN_KEY);
         list.sort(Comparator.naturalOrder());
         StringBuilder url = new StringBuilder();
         url.append(request.getRequestURI());
@@ -166,12 +159,13 @@ public class AccessHandler implements HandlerInterceptor {
             url.append(webSession.getSecretKey());
         }
         String sign = Sha256.encrypt(url.toString());
-        return sign.equals(request.getParameter(SIGN_KEY));
+        assert sign != null;
+        return sign.equals(request.getParameter(Constants.SIGN_KEY));
     }
 
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        String accept = request.getHeader("Accept");
+        String accept = request.getHeader(Constants.ACCEPT);
         if (MediaType.APPLICATION_JSON_VALUE.equals(accept) || MediaType.ALL_VALUE.equals(accept)) {
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         }
@@ -181,7 +175,7 @@ public class AccessHandler implements HandlerInterceptor {
     public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object handler, Exception e) throws Exception {
         Method method = ((HandlerMethod) handler).getMethod();
         long endTime = System.currentTimeMillis();
-        long timeSpan = 2000L;
+        long timeSpan = Constants.OVER_TIME;
         long time = endTime - beginTime;
         if (time > timeSpan) {
             TimeoutInfo visit = new TimeoutInfo();
@@ -201,5 +195,6 @@ public class AccessHandler implements HandlerInterceptor {
             visit.setTimeSpan(time);
             logServiceImpl.insertVisit(visit);
         }
+        ThreadWebContextHolder.removeContext();
     }
 }

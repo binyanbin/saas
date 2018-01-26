@@ -20,23 +20,9 @@ public class WebContext {
 
     private HttpServletRequest request;
 
-    private BeanFactory beanFactory;
-
-    public BeanFactory getBeanFactory() {
-        return beanFactory;
-    }
-
-    public void setBeanFactory(BeanFactory beanFactory) {
-        this.beanFactory = beanFactory;
-    }
-
-    public <T> T getBean(String name){
-        return (T) beanFactory.getBean(name);
-    }
-
-    private String token;
-
     private ApiMethodAttribute methodAttribute;
+
+    private BeanFactory beanFactory;
 
     public ApiMethodAttribute getMethodAttribute() {
         return methodAttribute;
@@ -46,19 +32,12 @@ public class WebContext {
         this.methodAttribute = methodAttribute;
     }
 
-    /**
-     * @return the token
-     */
-    public String getToken() {
-        return token;
+    public BeanFactory getBeanFactory() {
+        return beanFactory;
     }
 
-    /**
-     * @param token
-     *            the token to set
-     */
-    public void setToken(String token) {
-        this.token = token;
+    public void setBeanFactory(BeanFactory beanFactory) {
+        this.beanFactory = beanFactory;
     }
 
     /**

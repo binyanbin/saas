@@ -18,7 +18,7 @@ import java.util.UUID;
 @Component
 public class WebSessionManager {
 
-    private int timeout;
+    private static final int timeout = 1000 * 60 * 24 * 7;
 
     private ICacheClient cacheClient;
 
@@ -30,16 +30,8 @@ public class WebSessionManager {
     /**
      * 每个用户只允许一个会话。
      */
-    private boolean singlePerUser;
+    private boolean singlePerUser = false;
 
-
-    public int getTimeout() {
-        return (int) CacheKeyPrefix.UserSession.getTimeout();
-    }
-
-    public void setTimeout(int timeout) {
-        this.timeout = timeout;
-    }
 
     private String getCacheKeyPrefix() {
         return CacheKeyPrefix.UserSession.getKey();
@@ -86,7 +78,7 @@ public class WebSessionManager {
         String cacheValue = cacheClient.get(cacheKey);
         WebSession webSession = new Gson().fromJson(cacheValue, WebSession.class);
         if (null != webSession) {
-            cacheClient.touch(cacheKey, getTimeout());
+            cacheClient.touch(cacheKey, timeout);
         }
         return webSession;
     }

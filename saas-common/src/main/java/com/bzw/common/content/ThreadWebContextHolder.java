@@ -20,12 +20,10 @@ public class ThreadWebContextHolder {
         THREAD_LOCAL.set(value);
     }
 
-    public static <T> T getBean(String name) {
-        WebContext webContext = THREAD_LOCAL.get();
-        if (webContext != null) {
-            return THREAD_LOCAL.get().getBean(name);
-        } else {
-            return null;
+    public static void removeContext() {
+        WebContext session = THREAD_LOCAL.get();
+        if (null != session) {
+            THREAD_LOCAL.remove();
         }
     }
 }
