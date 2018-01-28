@@ -51,13 +51,6 @@ public class HttpClient {
 
     private static final Logger logger = Logger.getLogger(HttpClient.class);
 
-    /**
-     * 获取HttpClient对象
-     *
-     * @return
-     * @author SHANHY
-     * @create 2015年12月18日
-     */
     static CloseableHttpClient getHttpClient(String url) {
         String dot = ":";
         String hostname = url.split("/")[2];
@@ -77,13 +70,6 @@ public class HttpClient {
         return httpClient;
     }
 
-    /**
-     * 创建HttpClient对象
-     *
-     * @return
-     * @author SHANHY
-     * @create 2015年12月18日
-     */
     private static CloseableHttpClient createHttpClient(int maxTotal,
                                                         int maxPerRoute, int maxRoute, String hostname, int port) {
         ConnectionSocketFactory plainsf = PlainConnectionSocketFactory
@@ -172,15 +158,6 @@ public class HttpClient {
         }
     }
 
-    /**
-     * POST请求URL获取内容
-     *
-     * @param url
-     * @return
-     * @throws IOException
-     * @author SHANHY
-     * @create 2015年12月18日
-     */
     public static String post(String url, Map<String, Object> params) {
         HttpPost httppost = new HttpPost(url);
         setPostParams(httppost, params);
@@ -270,14 +247,6 @@ public class HttpClient {
         return result;
     }
 
-    /**
-     * GET请求URL获取内容
-     *
-     * @param url
-     * @return
-     * @author SHANHY
-     * @create 2015年12月18日
-     */
     public static String get(String url) {
         HttpGet httpget = new HttpGet(url);
         CloseableHttpResponse response = null;
