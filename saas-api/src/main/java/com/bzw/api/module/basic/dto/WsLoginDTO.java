@@ -4,7 +4,7 @@ package com.bzw.api.module.basic.dto;
  * @author yanbin
  */
 @SuppressWarnings("AlibabaLowerCamelCaseVariableNaming")
-public class WeChatLoginDTO {
+public class WsLoginDTO {
     private String openid;
     private String session_key;
     private String unionid;
@@ -35,7 +35,7 @@ public class WeChatLoginDTO {
 
     @Override
     public String toString() {
-        return "WeChatLoginDTO{" +
+        return "WsLoginDTO{" +
                 "openid='" + openid + '\'' +
                 ", session_key='" + session_key + '\'' +
                 ", unionid='" + unionid + '\'' +

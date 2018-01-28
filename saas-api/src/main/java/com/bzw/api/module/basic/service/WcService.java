@@ -1,9 +1,9 @@
 package com.bzw.api.module.basic.service;
 
 import com.bzw.api.module.basic.constant.ExternalUrl;
-import com.bzw.api.module.basic.dto.WeChatAccessTokenDTO;
-import com.bzw.api.module.basic.dto.WeChatLoginDTO;
-import com.bzw.api.module.basic.dto.WeChatResult;
+import com.bzw.api.module.basic.dto.WsAccessTokenDTO;
+import com.bzw.api.module.basic.dto.WsLoginDTO;
+import com.bzw.api.module.basic.dto.WsResult;
 import com.bzw.api.module.basic.constant.WcConstants;
 import com.bzw.api.module.basic.param.WcQrCodeParam;
 import com.bzw.api.module.basic.param.WcTemplateData;
@@ -34,7 +34,7 @@ public class WcService {
         String url = String.format(ExternalUrl.OPEN_ID_URL, wcConstants.getAppid(), wcConstants.getSecret(), jscode);
         String body = HttpClient.get(url);
         if (StringUtils.isNotBlank(body)) {
-            WeChatLoginDTO result = gson.fromJson(body, WeChatLoginDTO.class);
+            WsLoginDTO result = gson.fromJson(body, WsLoginDTO.class);
             return result.getOpenid();
         } else {
             return null;
@@ -49,7 +49,7 @@ public class WcService {
             String url = String.format(ExternalUrl.ACCESS_TOKEN_URL, wcConstants.getAppid(), wcConstants.getSecret());
             String body = HttpClient.get(url);
             if (StringUtils.isNotBlank(body)) {
-                WeChatAccessTokenDTO result = gson.fromJson(body, WeChatAccessTokenDTO.class);
+                WsAccessTokenDTO result = gson.fromJson(body, WsAccessTokenDTO.class);
                 redisClient.set(ExternalUrl.WE_CHAT_KEY, result.getAccess_token(), result.getExpires_in());
                 return result.getAccess_token();
             } else {
@@ -67,7 +67,7 @@ public class WcService {
         return HttpClient.postJson(url, paramContent);
     }
 
-    public WeChatResult sendTemplateMessage(String openId, String formId, String time, String amount, String projectName,String queryString) {
+    public WsResult sendTemplateMessage(String openId, String formId, String time, String amount, String projectName, String queryString) {
         String accessToken = getAccessToken();
         String url = String.format(ExternalUrl.TEMPLATE_MESSAGE_URL, accessToken);
         WcTemplateMessageParam param = new WcTemplateMessageParam();
@@ -81,6 +81,6 @@ public class WcService {
         data.setKeyword3(projectName);
         String paramContent = gson.toJson(param, WcTemplateMessageParam.class);
         String result = HttpClient.postJsonStr(url, paramContent);
-        return gson.fromJson(result, WeChatResult.class);
+        return gson.fromJson(result, WsResult.class);
     }
 }

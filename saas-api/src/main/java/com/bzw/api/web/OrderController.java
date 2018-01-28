@@ -2,11 +2,12 @@ package com.bzw.api.web;
 
 import com.bzw.api.module.basic.constant.WarnMessage;
 import com.bzw.api.module.basic.dto.OrderDetailDTO;
-import com.bzw.api.module.basic.dto.WeChatResult;
+import com.bzw.api.module.basic.dto.WsResult;
 import com.bzw.api.module.basic.enums.TechnicianState;
 import com.bzw.api.module.basic.model.Order;
 import com.bzw.api.module.basic.model.OrderDetail;
 import com.bzw.api.module.basic.model.Technician;
+import com.bzw.api.module.basic.param.AccessParam;
 import com.bzw.api.module.basic.param.OrderParam;
 import com.bzw.api.module.basic.service.*;
 import com.bzw.common.content.ApiMethodAttribute;
@@ -43,6 +44,9 @@ public class OrderController extends BaseController {
 
     @Autowired
     private OrderQueryService orderQueryService;
+
+    @Autowired
+    private TechnicianEventService technicianEventService;
 
     @RequestMapping(value = "room/{roomId}/clientBook", method = {RequestMethod.POST, RequestMethod.OPTIONS})
     @ApiMethodAttribute(nonSignatureValidation = true, nonSessionValidation = true)
@@ -82,6 +86,13 @@ public class OrderController extends BaseController {
         return wrapperJsonView(orderQueryService.getOrderDto(id));
     }
 
+    @RequestMapping(value = "/{id}/pay",method = {RequestMethod.POST, RequestMethod.OPTIONS})
+    @ApiMethodAttribute(nonSignatureValidation = true, nonSessionValidation = true)
+    public Object pay(@PathVariable Long id) {
+        orderEventService.pay(id,null);
+        return wrapperJsonView(true);
+    }
+
     @RequestMapping(value = "/{id}/modify/desk", method = {RequestMethod.POST, RequestMethod.OPTIONS})
     @ApiMethodAttribute(nonSignatureValidation = true)
     public Object modifyForDesk(@PathVariable Long id, @RequestBody List<OrderParam> orderParam) {
@@ -114,6 +125,15 @@ public class OrderController extends BaseController {
         return wrapperJsonView(orderDetail.getRoomName());
     }
 
+    @RequestMapping(value = "detail/{detailId}/technician/{technicianId}/access", method = {RequestMethod.POST, RequestMethod.OPTIONS})
+    @ApiMethodAttribute(nonSignatureValidation = true, nonSessionValidation = true)
+    public Object access(@PathVariable Long detailId, @PathVariable Long technicianId, @RequestBody AccessParam accessParam) {
+        Preconditions.checkArgument(accessParam.getGrade()!=null,"评价不存在");
+        Preconditions.checkArgument(accessParam.getOpenId()!=null,"openId不存在");
+        technicianEventService.assess(technicianId,detailId,accessParam.getGrade(),accessParam.getTags(),accessParam.getOpenId());
+        return wrapperJsonView(true);
+    }
+
     @RequestMapping(value = "{id}/templateMessage", method = {RequestMethod.POST, RequestMethod.OPTIONS})
     @ApiMethodAttribute(nonSignatureValidation = true, nonSessionValidation = true)
     public Object sendTemplateMessage(@PathVariable Long id, @RequestParam String formId) {
@@ -127,7 +147,7 @@ public class OrderController extends BaseController {
         }
         Preconditions.checkArgument(!CollectionUtils.isEmpty(technicianIds), WarnMessage.NOT_FOUND_ORDER);
         List<Technician> technicians = customerQueryService.listTechnicianByIds(technicianIds);
-        List<WeChatResult> result = Lists.newArrayList();
+        List<WsResult> result = Lists.newArrayList();
         for (Technician technician : technicians) {
             OrderDetailDTO orderDetailDTO = mapOrderDetail.get(technician.getId());
             if (StringUtils.isNotBlank(technician.getWechatId())) {

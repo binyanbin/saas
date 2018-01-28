@@ -1,6 +1,9 @@
 package com.bzw.api.module.basic.dto;
 
-public class WeChatResult {
+/**
+ * @author yanbin
+ */
+public class WsResult {
     private Integer errcode;
     private String errmsg;
 

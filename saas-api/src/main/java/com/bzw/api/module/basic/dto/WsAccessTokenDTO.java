@@ -3,7 +3,7 @@ package com.bzw.api.module.basic.dto;
 /**
  * @author yanbin
  */
-public class WeChatAccessTokenDTO {
+public class WsAccessTokenDTO {
     private String access_token;
     private Integer expires_in;
 
@@ -25,7 +25,7 @@ public class WeChatAccessTokenDTO {
 
     @Override
     public String toString() {
-        return "WeChatAccessTokenDTO{" +
+        return "WsAccessTokenDTO{" +
                 "access_token='" + access_token + '\'' +
                 ", expires_in=" + expires_in +
                 '}';

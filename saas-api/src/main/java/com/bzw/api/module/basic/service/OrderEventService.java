@@ -220,7 +220,6 @@ public class OrderEventService {
         return order.getId();
     }
 
-
     public OrderDetail serve(Long orderDetailId) {
         Date now = new Date();
         OrderDetail orderDetail = orderQueryBiz.getOrderDetail(orderDetailId);
@@ -300,5 +299,19 @@ public class OrderEventService {
             WebSocket.sendMessage(order.getWechatId(), message);
         }
         return orderDetail;
+    }
+
+    public Order pay(Long orderId,BigDecimal price){
+        Order order = orderQueryBiz.getOrder(orderId);
+        if (price ==null) {
+            price = order.getPrice();
+        }
+        Date now = new Date();
+        order.setPayPrice(price);
+        order.setPayTime(now);
+        order.setBizStatusId(OrderState.paid.getValue());
+        order.setModifiedTime(now);
+        orderEventBiz.update(order);
+        return order;
     }
 }
