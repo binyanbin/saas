@@ -1,6 +1,7 @@
 package com.bzw.api.module.basic.service;
 
 import com.bzw.api.module.basic.biz.*;
+import com.bzw.api.module.basic.constant.LogConstants;
 import com.bzw.api.module.basic.enums.*;
 import com.bzw.api.module.basic.model.*;
 import com.bzw.api.module.basic.param.OrderParam;
@@ -9,6 +10,7 @@ import com.bzw.api.module.basic.param.PushTechnicianParam;
 import com.bzw.api.web.WebSocket;
 import com.bzw.common.sequence.SeqType;
 import com.bzw.common.sequence.SequenceService;
+import com.bzw.common.utils.DtUtils;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -56,6 +58,9 @@ public class OrderEventService {
 
     @Autowired
     private TechnicianEventBiz technicianEventBiz;
+
+    @Autowired
+    private RecordChangeEventBiz recordChangeEventBiz;
 
     @Autowired
     private Gson gson;
@@ -194,7 +199,7 @@ public class OrderEventService {
                 pushTechnicianParam.setProjectId(project.getId());
                 pushTechnicianParam.setProjectName(project.getName());
                 pushTechnicianParam.setTechnicianId(technician.getId());
-                pushTechnicianParam.setTxt("请技师"+technician.getName()+"去"+room.getNumber()+"上钟");
+                pushTechnicianParam.setTxt("请技师" + technician.getName() + "去" + room.getNumber() + "上钟");
                 pushTechnicianParams.add(pushTechnicianParam);
             }
         }
@@ -214,9 +219,21 @@ public class OrderEventService {
         room.setOrderId(orderId);
         room.setBizStatusId(RoomState.waiting.getValue());
         roomEventBiz.update(room);
+
+        recordChangeEventBiz.add(RecordChangeType.room, room.getId(), room.getTenantId(), now,
+                String.format(LogConstants.ROOM_BOOK_LOG, DtUtils.toString(now)));
+
         technicianEventBiz.updateList(technicians);
         String message = gson.toJson(pushTechnicianParams);
-        WebSocket.sendMessage(branchId.toString(),message);
+        WebSocket.sendMessage(branchId.toString(), message);
+
+        if (!isUpdate) {
+            recordChangeEventBiz.add(RecordChangeType.order, order.getId(), order.getTenantId(), now,
+                    String.format(LogConstants.ORDER_CREATE_LOG, DtUtils.toString(now)));
+        } else {
+            recordChangeEventBiz.add(RecordChangeType.order, order.getId(), order.getTenantId(), now,
+                    String.format(LogConstants.ORDER_MODIFY_LOG, DtUtils.toString(now)));
+        }
         return order.getId();
     }
 
@@ -301,9 +318,9 @@ public class OrderEventService {
         return orderDetail;
     }
 
-    public Order pay(Long orderId,BigDecimal price){
+    public Order pay(Long orderId, BigDecimal price) {
         Order order = orderQueryBiz.getOrder(orderId);
-        if (price ==null) {
+        if (price == null) {
             price = order.getPrice();
         }
         Date now = new Date();
@@ -312,6 +329,8 @@ public class OrderEventService {
         order.setBizStatusId(OrderState.paid.getValue());
         order.setModifiedTime(now);
         orderEventBiz.update(order);
+        recordChangeEventBiz.add(RecordChangeType.order, order.getId(), order.getTenantId(), now,
+                String.format(LogConstants.ORDER_PAY_LOG, DtUtils.toString(now), price.toString()));
         return order;
     }
 }

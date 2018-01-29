@@ -1,6 +1,7 @@
 package com.bzw.api.module.basic.biz;
 
 import com.bzw.api.module.basic.dao.*;
+import com.bzw.api.module.basic.enums.RoomState;
 import com.bzw.api.module.basic.model.*;
 import com.bzw.common.enums.Status;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,13 +53,20 @@ public class RoomQueryBiz {
         Integer type = project.getType();
         Long branchId = project.getBranchId();
         RoomExample roomExample = new RoomExample();
-        roomExample.createCriteria().andBranchIdEqualTo(branchId).andTypeEqualTo(type);
+        roomExample.createCriteria().andBranchIdEqualTo(branchId).andTypeEqualTo(type).andStatusIdEqualTo(Status.Valid.getValue());
         return roomMapper.selectByExample(roomExample);
     }
 
     public List<Room> listRoomByIds(List<Long> roomIds) {
         RoomExample roomExample = new RoomExample();
         roomExample.createCriteria().andIdIn(roomIds);
+        return roomMapper.selectByExample(roomExample);
+    }
+
+    public List<Room> listRoomByRoomSate(RoomState roomState){
+        RoomExample roomExample = new RoomExample();
+        roomExample.createCriteria().andStatusIdEqualTo(Status.Valid.getValue())
+        .andBizStatusIdEqualTo(roomState.getValue());
         return roomMapper.selectByExample(roomExample);
     }
 

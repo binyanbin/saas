@@ -1,5 +1,8 @@
 package com.bzw.api.module.basic.param;
 
+/**
+ * @author yanbin
+ */
 public class AccessParam {
     private String openId;
     private Integer grade;

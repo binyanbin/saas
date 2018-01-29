@@ -1,6 +1,6 @@
 package com.bzw.api.web;
 
-import com.bzw.api.module.basic.service.CustomerQueryService;
+import com.bzw.api.module.basic.service.TechnicianQueryService;
 import com.bzw.common.content.ApiMethodAttribute;
 import com.bzw.common.web.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class TechnicianController extends BaseController {
 
     @Autowired
-    private CustomerQueryService customerQueryService;
+    private TechnicianQueryService technicianQueryService;
 
     @RequestMapping("/{technicianId}")
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
     public Object getBranch(@PathVariable Long technicianId) {
-        return wrapperJsonView(customerQueryService.getTechnicianDetail(technicianId));
+        return wrapperJsonView(technicianQueryService.getTechnicianDetail(technicianId));
     }
 
 }

@@ -64,7 +64,7 @@ public class WebSocket {
         if (socket != null) {
             try {
                 socket.sendMessage(message);
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 webSocketMap.remove(key);
             }
         }

@@ -3,6 +3,7 @@ package com.bzw.api.module.basic.service;
 import com.bzw.api.module.basic.biz.TechnicianEventBiz;
 import com.bzw.api.module.basic.biz.TechnicianQueryBiz;
 import com.bzw.api.module.basic.constant.WarnMessage;
+import com.bzw.api.module.basic.enums.TechnicianState;
 import com.bzw.api.module.basic.model.Technician;
 import com.bzw.api.module.basic.model.TechnicianAssess;
 import com.bzw.api.module.basic.model.TechnicianTag;
@@ -66,5 +67,29 @@ public class TechnicianEventService {
                 technicianEventBiz.addTechnicianTag(technicianTagList);
             }
         }
+    }
+
+    public void freeTechnician(Long id){
+        modifyTechnicianByType(id,1);
+    }
+
+    public void finishTechnician(Long id){
+        modifyTechnicianByType(id,2);
+    }
+
+    private void modifyTechnicianByType(Long id,int type){
+        Technician technician = technicianQueryBiz.getTechnicianById(id);
+        if (technician!=null){
+            technician.setOverTime(null);
+            technician.setOverTime(null);
+            technician.setBizStatusId(TechnicianState.free.getValue());
+            technician.setRoomId(null);
+            technician.setRoomName(null);
+            technician.setOrderDetailId(null);
+            if (type==2) {
+                technician.setOrderCount(technician.getOrderCount()+1);
+            }
+        }
+        technicianEventBiz.updateTechnician(technician);
     }
 }

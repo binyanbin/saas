@@ -2,6 +2,7 @@ package com.bzw.api.web;
 
 import com.bzw.api.module.basic.service.CustomerQueryService;
 import com.bzw.api.module.basic.service.RoomQueryService;
+import com.bzw.api.module.basic.service.TechnicianQueryService;
 import com.bzw.common.content.ApiMethodAttribute;
 import com.bzw.common.web.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +20,15 @@ public class ProjectController extends BaseController {
     private CustomerQueryService customerQueryService;
 
     @Autowired
+    private TechnicianQueryService technicianQueryService;
+
+    @Autowired
     private RoomQueryService roomQueryService;
 
     @RequestMapping("/{projectId}/technicians")
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
     public Object listTechnicians(@PathVariable Integer projectId) {
-        return wrapperJsonView(customerQueryService.listTechnicianByProjectId(projectId));
+        return wrapperJsonView(technicianQueryService.listTechnicianByProjectId(projectId));
     }
 
     @RequestMapping("/{projectId}/rooms")

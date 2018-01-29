@@ -53,7 +53,6 @@ public class OrderQueryBiz {
         OrderDetailExample orderDetailExample = new OrderDetailExample();
         orderDetailExample.createCriteria().andOrderIdIn(detailIds);
         return orderDetailMapper.selectByExample(orderDetailExample);
-
     }
 
 }

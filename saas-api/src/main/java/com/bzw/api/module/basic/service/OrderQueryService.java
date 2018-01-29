@@ -19,6 +19,9 @@ import org.springframework.util.CollectionUtils;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author yanbin
+ */
 @Service
 public class OrderQueryService {
 
@@ -112,8 +115,10 @@ public class OrderQueryService {
             orderDTO.setBranchName(orderDetails.get(0).getBranchName());
             orderDTO.setPrice(order.getPrice());
             List<OrderDetail> orderDetailList = mapOrderDetail.get(order.getId());
-            orderDTO.setDetails(mapToOrderDetailDto(orderDetailList));
-            result.add(orderDTO);
+            if (!CollectionUtils.isEmpty(orderDetailList)) {
+                orderDTO.setDetails(mapToOrderDetailDto(orderDetailList));
+                result.add(orderDTO);
+            }
         }
         return result;
     }

@@ -1,11 +1,13 @@
 package com.bzw.api.module.basic.service;
 
 import com.bzw.api.module.basic.biz.*;
+import com.bzw.api.module.basic.constant.LogConstants;
 import com.bzw.api.module.basic.constant.WarnMessage;
 import com.bzw.api.module.basic.enums.*;
 import com.bzw.api.module.basic.model.*;
 import com.bzw.common.sequence.ISequence;
 import com.bzw.common.sequence.SeqType;
+import com.bzw.common.utils.DtUtils;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -49,14 +51,20 @@ public class RoomEventService {
     @Autowired
     private OrderEventBiz orderEventBiz;
 
+    @Autowired
+    private TechnicianEventService technicianEventService;
+
     /**
      * 开房
      */
     public boolean open(Long roomId, Long employeeId) {
+        Date now = new Date();
         Room room = roomQueryBiz.getRoom(roomId);
         Preconditions.checkArgument(room != null, WarnMessage.NOT_FOUND_ROOM);
         Preconditions.checkArgument(room.getBizStatusId().equals(RoomState.free.getValue()) ||
                 room.getBizStatusId().equals(RoomState.booked.getValue()), WarnMessage.ROOM_USED);
+        recordChangeEventBiz.add(RecordChangeType.room, room.getId(), room.getTenantId(), now,
+                String.format(LogConstants.ROOM_OPEN_LOG, DtUtils.toString(now)));
         return updateRoomState(room, employeeId, RoomState.open.getValue());
     }
 
@@ -64,9 +72,12 @@ public class RoomEventService {
      * 订房
      */
     public boolean book(Long roomId, Long employeeId) {
+        Date now = new Date();
         Room room = roomQueryBiz.getRoom(roomId);
         Preconditions.checkArgument(room != null, WarnMessage.NOT_FOUND_ROOM);
         Preconditions.checkArgument(room.getBizStatusId().equals(RoomState.free.getValue()), "房间已被预定或使用");
+        recordChangeEventBiz.add(RecordChangeType.room, room.getId(), room.getTenantId(), now,
+                String.format(LogConstants.ROOM_BOOK_LOG, DtUtils.toString(now)));
         return updateRoomState(room, employeeId, RoomState.booked.getValue());
     }
 
@@ -92,11 +103,7 @@ public class RoomEventService {
             orderDetail.setEndTime(null);
         }
         for (Technician technician : technicians) {
-            technician.setBizStatusId(TechnicianState.free.getValue());
-            technician.setStartTime(null);
-            technician.setOverTime(null);
-            technician.setRoomName(null);
-            technician.setRoomId(null);
+            technicianEventService.freeTechnician(technician.getId());
         }
         orderEventBiz.update(order);
         orderEventBiz.updateOrderDetails(orderDetailList);
@@ -108,6 +115,8 @@ public class RoomEventService {
         room.setModifiedId(employeeId);
         room.setModifiedTime(now);
         roomEventBiz.update(room);
+        recordChangeEventBiz.add(RecordChangeType.room, room.getId(), room.getTenantId(), now,
+                String.format(LogConstants.ROOM_CANCEL_LOG, DtUtils.toString(now)));
         return true;
     }
 

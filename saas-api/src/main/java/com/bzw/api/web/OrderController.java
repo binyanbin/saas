@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +47,9 @@ public class OrderController extends BaseController {
     @Autowired
     private TechnicianEventService technicianEventService;
 
+    @Autowired
+    private TechnicianQueryService technicianQueryService;
+
     @RequestMapping(value = "room/{roomId}/clientBook", method = {RequestMethod.POST, RequestMethod.OPTIONS})
     @ApiMethodAttribute(nonSignatureValidation = true, nonSessionValidation = true)
     public Object clientBook(@RequestBody List<OrderParam> orderParams, @PathVariable Long roomId, @RequestParam String openId) {
@@ -60,7 +62,7 @@ public class OrderController extends BaseController {
         List<Integer> statusIds = Lists.newArrayList();
         statusIds.add(TechnicianState.free.getValue());
         statusIds.add(TechnicianState.serving.getValue());
-        List<Technician> technicians = customerQueryService.listTechnicianByIds(technicianIds);
+        List<Technician> technicians = technicianQueryService.listTechnicianByIds(technicianIds);
         for (Technician technician :technicians){
             Preconditions.checkArgument(statusIds.contains(technician.getBizStatusId()),"["+technician.getName()+"]已被预约,暂时无法预约");
         }
@@ -111,7 +113,7 @@ public class OrderController extends BaseController {
 
     @RequestMapping(value = "detail/{detailId}/serve", method = {RequestMethod.POST, RequestMethod.OPTIONS})
     @ApiMethodAttribute(nonSignatureValidation = true, nonSessionValidation = true)
-    public Object serve(@PathVariable Long detailId) throws IOException {
+    public Object serve(@PathVariable Long detailId) {
         OrderDetail orderDetail = orderEventService.serve(detailId);
         Preconditions.checkArgument(orderDetail != null, WarnMessage.NOT_FOUND_ORDER);
         Order order = orderQueryService.getOrder(orderDetail.getOrderId());
@@ -146,7 +148,7 @@ public class OrderController extends BaseController {
             mapOrderDetail.put(orderDetailDTO.getTechnicianId(), orderDetailDTO);
         }
         Preconditions.checkArgument(!CollectionUtils.isEmpty(technicianIds), WarnMessage.NOT_FOUND_ORDER);
-        List<Technician> technicians = customerQueryService.listTechnicianByIds(technicianIds);
+        List<Technician> technicians = technicianQueryService.listTechnicianByIds(technicianIds);
         List<WsResult> result = Lists.newArrayList();
         for (Technician technician : technicians) {
             OrderDetailDTO orderDetailDTO = mapOrderDetail.get(technician.getId());
