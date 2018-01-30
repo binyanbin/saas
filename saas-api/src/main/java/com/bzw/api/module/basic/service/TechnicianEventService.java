@@ -1,9 +1,13 @@
 package com.bzw.api.module.basic.service;
 
+import com.bzw.api.module.basic.biz.OrderEventBiz;
+import com.bzw.api.module.basic.biz.OrderQueryBiz;
 import com.bzw.api.module.basic.biz.TechnicianEventBiz;
 import com.bzw.api.module.basic.biz.TechnicianQueryBiz;
 import com.bzw.api.module.basic.constant.WarnMessage;
+import com.bzw.api.module.basic.enums.OrderDetailState;
 import com.bzw.api.module.basic.enums.TechnicianState;
+import com.bzw.api.module.basic.model.OrderDetail;
 import com.bzw.api.module.basic.model.Technician;
 import com.bzw.api.module.basic.model.TechnicianAssess;
 import com.bzw.api.module.basic.model.TechnicianTag;
@@ -31,11 +35,25 @@ public class TechnicianEventService {
     private TechnicianQueryBiz technicianQueryBiz;
 
     @Autowired
+    private OrderQueryBiz orderQueryBiz;
+
+    @Autowired
+    private OrderEventBiz orderEventBiz;
+
+    @Autowired
     private SequenceService sequenceService;
 
+    /**
+     * 评价技师
+     */
     public void assess(Long technicianId,Long orderDetailId,Integer grade,String tag,String openId){
         Technician technician = technicianQueryBiz.getTechnicianById(technicianId);
         Preconditions.checkArgument(technician!=null, WarnMessage.NOT_FOUND_TECHNICIAN);
+        OrderDetail orderDetail = orderQueryBiz.getOrderDetail(orderDetailId);
+        Preconditions.checkArgument(orderDetail!=null,WarnMessage.NOT_FOUND_ORDER);
+        orderDetail.setBizStatusId(OrderDetailState.access.getValue());
+        orderEventBiz.updateOrderDetail(orderDetail);
+
         Long accessId = sequenceService.newKey(SeqType.technicianAssess);
         TechnicianAssess technicianAssess =new TechnicianAssess();
         technicianAssess.setId(accessId);
@@ -69,10 +87,16 @@ public class TechnicianEventService {
         }
     }
 
+    /**
+     * 释放技师
+     */
     public void freeTechnician(Long id){
         modifyTechnicianByType(id,1);
     }
 
+    /**
+     * 技师工作完成
+     */
     public void finishTechnician(Long id){
         modifyTechnicianByType(id,2);
     }
@@ -80,7 +104,7 @@ public class TechnicianEventService {
     private void modifyTechnicianByType(Long id,int type){
         Technician technician = technicianQueryBiz.getTechnicianById(id);
         if (technician!=null){
-            technician.setOverTime(null);
+            technician.setStartTime(null);
             technician.setOverTime(null);
             technician.setBizStatusId(TechnicianState.free.getValue());
             technician.setRoomId(null);

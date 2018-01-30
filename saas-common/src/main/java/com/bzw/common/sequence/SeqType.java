@@ -29,7 +29,8 @@ public enum SeqType {
     tenant("biz_tenant","tenantMapper"),
     function("pl_function","functionMapper"),
     role("pl_role","roleMapper"),
-    roleFunction("pl_role_function","roleFunction"),
+    roleFunction("pl_role_function","roleFunctionMapper"),
+    message("pl_message","messageMapper")
     ;
 
     private String key;

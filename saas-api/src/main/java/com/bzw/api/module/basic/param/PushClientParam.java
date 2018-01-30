@@ -9,6 +9,15 @@ public class PushClientParam {
     private Long orderDetailId;
     private Integer projectId;
     private String projectName;
+    private String text;
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
 
     public Long getOrderDetailId() {
         return orderDetailId;

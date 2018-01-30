@@ -26,12 +26,16 @@ public class WebSocket {
 
     private static final String KEY = "id";
 
+    public static Map<String,WebSocket> getWebSocketMap(){
+        return webSocketMap;
+    }
+
     @OnOpen
     public void onOpen(Session session) {
         this.session = session;
-        String[] strs = session.getQueryString().split("=");
-        if (KEY.equals(strs[0])) {
-            webSocketMap.put(strs[1], this);
+        String[] strArray = session.getQueryString().split("=");
+        if (KEY.equals(strArray[0])) {
+            webSocketMap.put(strArray[1], this);
             addOnlineCount();
             System.out.println("有新链接加入!当前在线人数为" + getOnlineCount());
         }
@@ -59,15 +63,18 @@ public class WebSocket {
         System.out.println("来自客户端的消息:" + message);
     }
 
-    public static void sendMessage(String key, String message) {
+    public static boolean sendMessage(String key, String message) {
         WebSocket socket = webSocketMap.get(key);
         if (socket != null) {
             try {
                 socket.sendMessage(message);
+                return true;
             } catch (Exception ex) {
                 webSocketMap.remove(key);
+                return false;
             }
         }
+        return false;
     }
 
     private void sendMessage(String message) throws IOException {

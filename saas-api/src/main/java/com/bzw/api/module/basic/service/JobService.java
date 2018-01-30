@@ -1,22 +1,23 @@
 package com.bzw.api.module.basic.service;
 
-import com.bzw.api.module.basic.biz.OrderEventBiz;
-import com.bzw.api.module.basic.biz.OrderQueryBiz;
-import com.bzw.api.module.basic.biz.RoomEventBiz;
-import com.bzw.api.module.basic.biz.RoomQueryBiz;
+import com.bzw.api.module.basic.biz.*;
 import com.bzw.api.module.basic.enums.OrderDetailState;
+import com.bzw.api.module.basic.enums.OrderState;
 import com.bzw.api.module.basic.enums.RoomState;
+import com.bzw.api.module.basic.model.Message;
+import com.bzw.api.module.basic.model.Order;
 import com.bzw.api.module.basic.model.OrderDetail;
 import com.bzw.api.module.basic.model.Room;
-import org.apache.commons.lang3.time.DateFormatUtils;
+import com.bzw.api.web.WebSocket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
-/**
+/*
  * @author yanbin
  */
 @Component
@@ -37,38 +38,58 @@ public class JobService {
     private OrderEventBiz orderEventBiz;
 
     @Autowired
-    private RoomEventBiz roomEventBiz;
+    private RoomEventService roomEventService;
 
-    @Scheduled(fixedDelay = ONE_Minute, initialDelay = ONE_Minute)
+    @Autowired
+    private MessageQueryBiz messageQueryBiz;
+
+    @Autowired
+    private MessageEventBiz messageEventBiz;
+
+    @Scheduled(fixedDelay = ONE_Minute * 2, initialDelay = ONE_Minute)
     public void finishOrder() {
         Date now = new Date();
-        System.out.println(DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss") + " >>rate task executed....");
         List<Room> roomList = roomQueryBiz.listRoomByRoomSate(RoomState.unfinished);
         for (Room room : roomList) {
-            if (room.getOverTime().compareTo(now) >= 0) {
+            if (now.compareTo(room.getOverTime()) >= 0) {
                 List<OrderDetail> orderDetailList = orderQueryBiz.listOrderDetail(room.getOrderId());
-                boolean isFinish =true;
+                boolean isFinish = true;
                 for (OrderDetail orderDetail : orderDetailList) {
-                    if (orderDetail.getEndTime().compareTo(now) >= 0){
+                    if (now.compareTo(orderDetail.getEndTime()) >= 0) {
                         orderDetail.setBizStatusId(OrderDetailState.finished.getValue());
                         technicianEventService.finishTechnician(orderDetail.getTechnicianId());
                         orderEventBiz.updateOrderDetail(orderDetail);
-                    }
-                    else {
-                        isFinish =false;
+                    } else {
+                        isFinish = false;
                     }
                 }
-                if (isFinish){
-                    room.setOrderId(null);
-                    room.setStartTime(null);
-                    room.setOverTime(null);
-                    room.setBizStatusId(RoomState.free.getValue());
-                    room.setModifiedTime(now);
-                    roomEventBiz.update(room);
+                if (isFinish) {
+                    Order order = orderQueryBiz.getOrder(room.getOrderId());
+                    if (order.getBizStatusId().equals(OrderState.paid.getValue())) {
+                        order.setBizStatusId(OrderState.finish.getValue());
+                        order.setModifiedTime(now);
+                        orderEventBiz.update(order);
+                    }
+                    roomEventService.freeRoom(null, room, now);
                 }
             }
         }
+    }
 
+    @Scheduled(fixedDelay = ONE_Minute )
+    public void finishMessage(){
+        Map<String,WebSocket> mapWebsocket = WebSocket.getWebSocketMap();
+        for(Map.Entry<String,WebSocket> entry :mapWebsocket.entrySet()) {
+            String id = entry.getKey();
+            List<Message> messageList = messageQueryBiz.listByReceiver(id);
+            for (Message message : messageList) {
+                boolean isSend = WebSocket.sendMessage(message.getReceiver(), message.getJson());
+                if (isSend) {
+                    message.setIsFinish(Byte.parseByte("1"));
+                    messageEventBiz.update(message);
+                }
+            }
+        }
     }
 }
 

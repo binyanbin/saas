@@ -31,9 +31,6 @@ public class RoomController extends BaseController {
     private CustomerQueryService customerQueryService;
 
     @Autowired
-    private CustomerEventService customerEventService;
-
-    @Autowired
     private RoomEventService roomEventService;
 
     @Autowired
@@ -73,6 +70,12 @@ public class RoomController extends BaseController {
     @ApiMethodAttribute(nonSignatureValidation = true)
     public Object bookRoom(@PathVariable Long roomId) {
         return wrapperJsonView(roomEventService.book(roomId,WebUtils.Session.getEmployeeId()));
+    }
+
+    @RequestMapping(value = "/{roomId}/finish", method = {RequestMethod.POST, RequestMethod.OPTIONS})
+    @ApiMethodAttribute(nonSignatureValidation = true)
+    public Object finishRoom(@PathVariable Long roomId) {
+        return wrapperJsonView(roomEventService.finish(roomId,WebUtils.Session.getEmployeeId()));
     }
 
     @RequestMapping(value="/{roomId}/cancel", method = {RequestMethod.POST, RequestMethod.OPTIONS})

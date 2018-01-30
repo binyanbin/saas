@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -82,6 +83,44 @@ public class RoomEventService {
     }
 
     /**
+     * 客人离开
+     */
+    public boolean finish(Long roomId, Long employeeId) {
+        Room room = roomQueryBiz.getRoom(roomId);
+        Date now = new Date();
+        Preconditions.checkArgument(room != null, WarnMessage.NOT_FOUND_ROOM);
+        Order order = orderQueryBiz.getOrder(room.getOrderId());
+        Preconditions.checkArgument(order != null, WarnMessage.NOT_FOUND_ORDER);
+        Preconditions.checkArgument(order.getBizStatusId().equals(OrderState.paid.getValue()), WarnMessage.NO_PAID);
+        List<OrderDetail> orderDetailList = orderQueryBiz.listOrderDetail(order.getId());
+        order.setBizStatusId(OrderState.finish.getValue());
+        order.setModifiedTime(now);
+        Set<Long> technicianIds = Sets.newHashSet();
+        List<OrderDetail> updateOrderDetails = Lists.newArrayList();
+        for (OrderDetail orderDetail : orderDetailList) {
+            if (orderDetail.getBizStatusId().equals(OrderDetailState.Serving.getValue())) {
+                technicianIds.add(orderDetail.getTechnicianId());
+                orderDetail.setBizStatusId(OrderDetailState.finished.getValue());
+                orderDetail.setEndTime(now);
+                updateOrderDetails.add(orderDetail);
+            }
+        }
+
+        if (!CollectionUtils.isEmpty(technicianIds)) {
+            List<Technician> technicians = technicianQueryBiz.listTechnicianByIds(Lists.newArrayList(technicianIds));
+            if (!CollectionUtils.isEmpty(technicians)) {
+                for (Technician technician : technicians) {
+                    technicianEventService.freeTechnician(technician.getId());
+                }
+            }
+        }
+        orderEventBiz.update(order);
+        orderEventBiz.updateOrderDetails(updateOrderDetails);
+        freeRoom(employeeId, room, now);
+        return true;
+    }
+
+    /**
      * 取消房间
      */
     public boolean cancel(Long roomId, Long employeeId) {
@@ -91,13 +130,13 @@ public class RoomEventService {
         Order order = orderQueryBiz.getOrder(room.getOrderId());
         List<OrderDetail> orderDetailList = orderQueryBiz.listOrderDetail(order.getId());
         Set<Long> technicianIds = Sets.newHashSet();
-        for (OrderDetail orderDetail : orderDetailList) {
-            technicianIds.add(orderDetail.getTechnicianId());
-        }
+
         List<Technician> technicians = technicianQueryBiz.listTechnicianByIds(Lists.newArrayList(technicianIds));
         order.setBizStatusId(OrderState.cancel.getValue());
         order.setModifiedTime(now);
+
         for (OrderDetail orderDetail : orderDetailList) {
+            technicianIds.add(orderDetail.getTechnicianId());
             orderDetail.setBizStatusId(OrderDetailState.cancel.getValue());
             orderDetail.setBeginTime(null);
             orderDetail.setEndTime(null);
@@ -108,16 +147,26 @@ public class RoomEventService {
         orderEventBiz.update(order);
         orderEventBiz.updateOrderDetails(orderDetailList);
         technicianEventBiz.updateList(technicians);
+        freeRoom(employeeId, room, now);
+        return true;
+    }
+
+    /**
+     * 释放房间
+     */
+    public void freeRoom(Long employeeId, Room room, Date now) {
         room.setOrderId(null);
         room.setStartTime(null);
         room.setOverTime(null);
         room.setBizStatusId(RoomState.free.getValue());
+        if (employeeId == null) {
+            employeeId = 0L;
+        }
         room.setModifiedId(employeeId);
         room.setModifiedTime(now);
         roomEventBiz.update(room);
         recordChangeEventBiz.add(RecordChangeType.room, room.getId(), room.getTenantId(), now,
                 String.format(LogConstants.ROOM_CANCEL_LOG, DtUtils.toString(now)));
-        return true;
     }
 
     private boolean updateRoomState(Room room, Long employeeId, Integer statusId) {

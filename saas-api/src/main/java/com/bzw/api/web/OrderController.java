@@ -1,8 +1,6 @@
 package com.bzw.api.web;
 
 import com.bzw.api.module.basic.constant.WarnMessage;
-import com.bzw.api.module.basic.dto.OrderDetailDTO;
-import com.bzw.api.module.basic.dto.WsResult;
 import com.bzw.api.module.basic.enums.TechnicianState;
 import com.bzw.api.module.basic.model.Order;
 import com.bzw.api.module.basic.model.OrderDetail;
@@ -15,15 +13,12 @@ import com.bzw.common.utils.WebUtils;
 import com.bzw.common.web.BaseController;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author yanbin
@@ -136,27 +131,4 @@ public class OrderController extends BaseController {
         return wrapperJsonView(true);
     }
 
-    @RequestMapping(value = "{id}/templateMessage", method = {RequestMethod.POST, RequestMethod.OPTIONS})
-    @ApiMethodAttribute(nonSignatureValidation = true, nonSessionValidation = true)
-    public Object sendTemplateMessage(@PathVariable Long id, @RequestParam String formId) {
-        List<OrderDetailDTO> orderDetails = orderQueryService.listOrderDetail(id);
-        Preconditions.checkArgument(!CollectionUtils.isEmpty(orderDetails), WarnMessage.NOT_FOUND_ORDER);
-        List<Long> technicianIds = Lists.newArrayList();
-        Map<Long, OrderDetailDTO> mapOrderDetail = Maps.newHashMap();
-        for (OrderDetailDTO orderDetailDTO : orderDetails) {
-            technicianIds.add(orderDetailDTO.getTechnicianId());
-            mapOrderDetail.put(orderDetailDTO.getTechnicianId(), orderDetailDTO);
-        }
-        Preconditions.checkArgument(!CollectionUtils.isEmpty(technicianIds), WarnMessage.NOT_FOUND_ORDER);
-        List<Technician> technicians = technicianQueryService.listTechnicianByIds(technicianIds);
-        List<WsResult> result = Lists.newArrayList();
-        for (Technician technician : technicians) {
-            OrderDetailDTO orderDetailDTO = mapOrderDetail.get(technician.getId());
-            if (StringUtils.isNotBlank(technician.getWechatId())) {
-                result.add(wcService.sendTemplateMessage(technician.getWechatId(), formId, DateUtils.formatDate(orderDetailDTO.getBookTime()),
-                        orderDetailDTO.getPrice().toString(), orderDetailDTO.getProjectName(), "?id=" + orderDetailDTO.getId().toString()));
-            }
-        }
-        return wrapperJsonView(result);
-    }
 }

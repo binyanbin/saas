@@ -9,9 +9,9 @@ public enum OrderDetailState {
      */
     booked(1, "已预定"),
     Serving(2, "服务中"),
-    finished(3,"服务完成"),
-    cancel(4,"服务取消"),
-    ;
+    finished(3, "服务完成"),
+    access(4, "服务已评价"),
+    cancel(9, "服务取消"),;
 
     private Integer value;
 

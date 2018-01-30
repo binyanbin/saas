@@ -45,6 +45,4 @@ public class TechnicianEventBiz {
             technicianTagMapper.insert(technicianTag);
         }
     }
-
-
 }

@@ -10,4 +10,8 @@ public class WarnMessage {
     public static final String ROOM_USED = "房间已被使用";
     public static final String TECHNICIAN_CONFIRM_ORDER = "技师正在赶来的路上";
     public static final String NOT_FOUND_TECHNICIAN = "未找到技师";
+    public static final String NO_PAID = "未支付，请先支付账单";
+    public static final String TECHNICIAN_SERVING = "技师已上钟";
+    public static final String TECHNICIAN_CANNOT_SERVING = "技师正在服务中";
+    public static final String TECHNICIAN_HURRY = "技师正在赶来的路上";
 }
