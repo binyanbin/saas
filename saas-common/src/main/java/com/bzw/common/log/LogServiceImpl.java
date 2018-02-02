@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 
@@ -33,11 +34,11 @@ public class LogServiceImpl implements ILogService {
     }
 
     @Override
-    public void insertExcept(JsonExceptionWrapper exception) {
+    public void insertExcept(JsonExceptionWrapper jsonExceptionWrapper,Throwable ex) {
         ExceptionInfo data = new ExceptionInfo();
-        data.setCode(exception.getCode());
-        data.setMsg(exception.getMsg());
-        data.setException(exception.getStackTrace());
+        data.setCode(jsonExceptionWrapper.getCode());
+        data.setMsg(jsonExceptionWrapper.getMsg());
+        data.setException(Arrays.toString(ex.getStackTrace()));
         if (MDC.get(Constants.PROFILE) != null) {
             data.setProfile(MDC.get(Constants.PROFILE));
         }

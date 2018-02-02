@@ -20,4 +20,7 @@ public final class Constants {
     public final static String USER_AGENT = "user-agent";
     public final static String PROXY_CLIENT_IP = "Proxy-Client-IP";
     public final static String WL_PROXY_CLIENT_IP = "WL-Proxy-Client-IP";
+    public final static Integer AVOID_DUPLICATE_TIME = 5;
+
+
 }

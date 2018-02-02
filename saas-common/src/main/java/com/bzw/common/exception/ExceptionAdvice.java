@@ -2,9 +2,11 @@ package com.bzw.common.exception;
 
 import com.bzw.common.log.LogServiceImpl;
 import com.bzw.common.web.JsonExceptionWrapper;
+import com.bzw.common.web.JsonWrapperService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.*;
@@ -20,45 +22,42 @@ import org.springframework.web.bind.annotation.*;
 public class ExceptionAdvice {
 
     private LogServiceImpl logServiceImpl;
+    private JsonWrapperService jsonWrapperService;
 
     @Autowired
-    public ExceptionAdvice(LogServiceImpl logServiceImpl){
+    public ExceptionAdvice(LogServiceImpl logServiceImpl, JsonWrapperService jsonWrapperService){
         this.logServiceImpl = logServiceImpl;
+        this.jsonWrapperService = jsonWrapperService;
     }
 
-    /**
-     * 400 - Bad Request
-     */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.OK)
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public JsonExceptionWrapper handleHttpMessageNotReadableException(
             HttpMessageNotReadableException e) {
         return wrapperException(e);
     }
 
-    /**
-     * 405 - Method Not Allowed
-     */
-    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    @ResponseStatus(HttpStatus.OK)
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public JsonExceptionWrapper handleHttpRequestMethodNotSupportedException(
             HttpRequestMethodNotSupportedException e) {
         return wrapperException(e);
     }
 
-    /**
-     * 415 - Unsupported Media Type
-     */
-    @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+
+    @ResponseStatus(HttpStatus.OK)
+    @ExceptionHandler({HttpMediaTypeNotAcceptableException.class})
+    public JsonExceptionWrapper handHttpMediaTypeNotAcceptableException(HttpMediaTypeNotAcceptableException e) {
+        return wrapperException(e);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public JsonExceptionWrapper handleHttpMediaTypeNotSupportedException(
             Exception e) {
         return wrapperException(e);
     }
 
-    /**
-     * 500 - Internal Server Error
-     */
     @ResponseStatus(HttpStatus.OK)
     @ExceptionHandler(Throwable.class)
     public JsonExceptionWrapper handleException(Throwable e) {
@@ -66,8 +65,8 @@ public class ExceptionAdvice {
     }
 
     private JsonExceptionWrapper wrapperException(Throwable e) {
-        JsonExceptionWrapper jsonExceptionWrapper = new JsonExceptionWrapper(e);
-        logServiceImpl.insertExcept(jsonExceptionWrapper);
+        JsonExceptionWrapper jsonExceptionWrapper = jsonWrapperService.getJsonExceptionWrapper(e);
+        logServiceImpl.insertExcept(jsonExceptionWrapper,e);
         return jsonExceptionWrapper;
     }
 }

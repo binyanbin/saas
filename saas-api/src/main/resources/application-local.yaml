@@ -90,4 +90,10 @@ sms:
   account: xxxxxxxxxx
   secret: xxxxxxxxxxxxxxxxxxx
   chanel: xxxx
+imageService:
+    path: ./
+    with: 512
+    url: http://localhost:8080/img/
+exception:
+    showStackTrace: true  
 

@@ -21,6 +21,7 @@ public enum ApplicationErrorCode {
     UsedSignature("20007", "签名已使用"),
     RedisLockException("20008","获取锁异常"),
     EventHandlerTimeout("20009","事件处理超时"),
+    NotFoundImage("20010","未找到图片"),
     ;
 
     private String code;

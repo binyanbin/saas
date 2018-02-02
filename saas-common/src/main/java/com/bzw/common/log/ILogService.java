@@ -11,7 +11,7 @@ public interface ILogService {
      * 新增异常日志方法
      * @param exception 异常对像
      */
-    void insertExcept(JsonExceptionWrapper exception);
+    void insertExcept(JsonExceptionWrapper exception,Throwable ex);
 
     /**
      * 新增超时日志方法

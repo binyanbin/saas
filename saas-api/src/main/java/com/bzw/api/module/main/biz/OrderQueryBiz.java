@@ -1,0 +1,58 @@
+package com.bzw.api.module.main.biz;
+
+import com.bzw.api.module.base.dao.OrderDetailMapper;
+import com.bzw.api.module.base.dao.OrderMapper;
+import com.bzw.api.module.base.model.Order;
+import com.bzw.api.module.base.model.OrderDetail;
+import com.bzw.api.module.base.model.OrderDetailExample;
+import com.bzw.api.module.base.model.OrderExample;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+/**
+ * @author yanbin
+ */
+@Service
+public class OrderQueryBiz {
+
+    @Autowired
+    private OrderMapper orderMapper;
+
+    @Autowired
+    private OrderDetailMapper orderDetailMapper;
+
+
+    public Order getOrder(Long orderId){
+        return orderMapper.selectByPrimaryKey(orderId);
+    }
+
+    public OrderDetail getOrderDetail(Long detailId){
+        return orderDetailMapper.selectByPrimaryKey(detailId);
+    }
+
+    public List<OrderDetail> listOrderDetail(Long orderId){
+        OrderDetailExample orderDetailExample = new OrderDetailExample();
+        orderDetailExample.createCriteria().andOrderIdEqualTo(orderId);
+        return orderDetailMapper.selectByExample(orderDetailExample);
+    }
+
+    public List<Order> listOrderByUserId(Long userId){
+        OrderExample orderExample = new OrderExample();
+        orderExample.createCriteria().andUserIdEqualTo(userId);
+        return orderMapper.selectByExample(orderExample);
+    }
+
+    public List<Order> listOrderByOpenId(String openId){
+        OrderExample orderExample = new OrderExample();
+        orderExample.createCriteria().andWechatIdEqualTo(openId);
+        return orderMapper.selectByExample(orderExample);
+    }
+
+    public List<OrderDetail> listOrderDetail(List<Long> detailIds){
+        OrderDetailExample orderDetailExample = new OrderDetailExample();
+        orderDetailExample.createCriteria().andOrderIdIn(detailIds);
+        return orderDetailMapper.selectByExample(orderDetailExample);
+    }
+
+}
