@@ -51,6 +51,7 @@ public class TechnicianEventService {
         Preconditions.checkArgument(technician!=null, WarnMessage.NOT_FOUND_TECHNICIAN);
         OrderDetail orderDetail = orderQueryBiz.getOrderDetail(orderDetailId);
         Preconditions.checkArgument(orderDetail!=null,WarnMessage.NOT_FOUND_ORDER);
+        Preconditions.checkArgument(orderDetail.getBizStatusId().equals(OrderDetailState.finished.getValue()),WarnMessage.SERVICE_NOT_FINISH);
         orderDetail.setBizStatusId(OrderDetailState.access.getValue());
         orderEventBiz.updateOrderDetail(orderDetail);
 

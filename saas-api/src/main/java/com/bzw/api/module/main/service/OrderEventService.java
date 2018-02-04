@@ -8,7 +8,6 @@ import com.bzw.api.module.main.enums.*;
 import com.bzw.api.module.main.params.OrderParam;
 import com.bzw.api.module.main.params.PushClientParam;
 import com.bzw.api.module.main.params.PushTechnicianParam;
-import com.bzw.api.module.mq.biz.MessageEventBiz;
 import com.bzw.api.module.mq.params.MessageParam;
 import com.bzw.api.module.mq.service.MqProducer;
 import com.bzw.common.sequence.SeqType;
@@ -211,23 +210,29 @@ public class OrderEventService {
         roomEventBiz.update(room);
         technicianEventBiz.updateTechnician(technician);
         orderEventBiz.updateOrderDetail(orderDetail);
-        if (StringUtils.isNotBlank(order.getWechatId())) {
-            PushClientParam pushClientParam = new PushClientParam();
-            pushClientParam.setProjectId(project.getId());
-            pushClientParam.setProjectName(project.getName());
-            pushClientParam.setRoomId(room.getId());
-            pushClientParam.setRoomName(room.getNumber());
-            pushClientParam.setTechnicianId(technician.getId());
-            pushClientParam.setTechnicianName(technician.getName());
-            pushClientParam.setOrderDetailId(orderDetailId);
-            pushClientParam.setText(technician.getName() + WarnMessage.TECHNICIAN_HURRY);
-            String message = gson.toJson(pushClientParam);
-            MessageParam messageParam = new MessageParam();
-            messageParam.setJson(message);
-            messageParam.setMessage(pushClientParam.getText());
+
+        PushClientParam pushClientParam = new PushClientParam();
+        pushClientParam.setProjectId(project.getId());
+        pushClientParam.setProjectName(project.getName());
+        pushClientParam.setRoomId(room.getId());
+        pushClientParam.setRoomName(room.getNumber());
+        pushClientParam.setTechnicianId(technician.getId());
+        pushClientParam.setTechnicianName(technician.getName());
+        pushClientParam.setOrderDetailId(orderDetailId);
+        pushClientParam.setText(technician.getName() + WarnMessage.TECHNICIAN_HURRY);
+        String message = gson.toJson(pushClientParam);
+        MessageParam messageParam = new MessageParam();
+        messageParam.setJson(message);
+        messageParam.setMessage(pushClientParam.getText());
+        if (order.getWechatId() != null) {
             messageParam.setReceiver(order.getWechatId());
+        } else if (order.getUserId() != null) {
+            messageParam.setReceiver(order.getUserId().toString());
+        }
+        if (StringUtils.isNotBlank(messageParam.getReceiver())) {
             mqProducer.send(messageParam);
         }
+
         return orderDetail;
     }
 
@@ -237,6 +242,7 @@ public class OrderEventService {
     public Order pay(Long orderId, BigDecimal price) {
         Order order = orderQueryBiz.getOrder(orderId);
         Preconditions.checkArgument(order != null, WarnMessage.NOT_FOUND_ORDER);
+        Preconditions.checkArgument(order.getBizStatusId().equals(OrderState.non_payment.getValue()),WarnMessage.ORDER_PAID);
         if (price == null) {
             price = order.getPrice();
         }

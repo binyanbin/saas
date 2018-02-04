@@ -1,14 +1,15 @@
 package com.bzw.api.module.main.service;
 
+import com.bzw.api.module.base.model.Branch;
+import com.bzw.api.module.base.model.Employee;
+import com.bzw.api.module.base.model.Project;
+import com.bzw.api.module.base.model.User;
 import com.bzw.api.module.main.biz.ProjectQueryBiz;
 import com.bzw.api.module.main.biz.RoomQueryBiz;
 import com.bzw.api.module.main.biz.UserQueryBiz;
 import com.bzw.api.module.main.dto.BranchDTO;
 import com.bzw.api.module.main.dto.ProjectDTO;
 import com.bzw.api.module.main.enums.ProjectType;
-import com.bzw.api.module.base.model.Branch;
-import com.bzw.api.module.base.model.Project;
-import com.bzw.api.module.base.model.User;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,9 +46,8 @@ public class CustomerQueryService {
         }
     }
 
-    public Boolean containPhone(String phone) {
-        List<User> users = userQueryBiz.listUserByPhone(phone);
-        return !CollectionUtils.isEmpty(users);
+    public List<User> listUsersByPhone(String phone) {
+        return userQueryBiz.listUserByPhone(phone);
     }
 
     public List<ProjectDTO> listProjectsByBranchId(Long branchId) {
@@ -84,5 +84,13 @@ public class CustomerQueryService {
         return projectDTO;
     }
 
+    public Employee getEmployeeByUsers(List<User> users){
+        List<Employee> employees = userQueryBiz.listEmployeeByUsers(users);
+        if (!CollectionUtils.isEmpty(employees)){
+            return employees.get(0);
+        } else{
+            return null;
+        }
+    }
 
 }

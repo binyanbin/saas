@@ -1,18 +1,15 @@
 package com.bzw.api.module.main.controller;
 
-import com.bzw.api.module.base.model.Order;
 import com.bzw.api.module.base.model.OrderDetail;
 import com.bzw.api.module.base.model.Technician;
 import com.bzw.api.module.main.constant.WarnMessage;
 import com.bzw.api.module.main.enums.TechnicianState;
 import com.bzw.api.module.main.params.AccessParam;
 import com.bzw.api.module.main.params.OrderParam;
-import com.bzw.api.module.main.params.PushClientParam;
 import com.bzw.api.module.main.service.OrderEventService;
 import com.bzw.api.module.main.service.OrderQueryService;
 import com.bzw.api.module.main.service.TechnicianEventService;
 import com.bzw.api.module.main.service.TechnicianQueryService;
-import com.bzw.api.module.mq.params.MessageParam;
 import com.bzw.api.module.mq.service.MqProducer;
 import com.bzw.common.content.ApiMethodAttribute;
 import com.bzw.common.content.DuplicationSubmit;
@@ -48,27 +45,21 @@ public class OrderController extends BaseController {
     @Autowired
     private TechnicianQueryService technicianQueryService;
 
-    @Autowired
-    private MqProducer mqProducer;
-
-    @Autowired
-    private Gson gson;
-
     @RequestMapping(value = "room/{roomId}/clientBook", method = {RequestMethod.POST, RequestMethod.OPTIONS})
     @ApiMethodAttribute(nonSignatureValidation = true, nonSessionValidation = true)
     public Object clientBook(@RequestBody List<OrderParam> orderParams, @PathVariable Long roomId, @RequestParam String openId) {
         Preconditions.checkArgument(StringUtils.isNotBlank(openId), "openId不存在");
-        Preconditions.checkArgument(!CollectionUtils.isEmpty(orderParams),"没有选择技师");
+        Preconditions.checkArgument(!CollectionUtils.isEmpty(orderParams), "没有选择技师");
         List<Long> technicianIds = Lists.newArrayList();
-        for (OrderParam orderParam :orderParams){
+        for (OrderParam orderParam : orderParams) {
             technicianIds.add(orderParam.getTechnicianId());
         }
         List<Integer> statusIds = Lists.newArrayList();
         statusIds.add(TechnicianState.free.getValue());
         statusIds.add(TechnicianState.serving.getValue());
         List<Technician> technicians = technicianQueryService.listTechnicianByIds(technicianIds);
-        for (Technician technician :technicians){
-            Preconditions.checkArgument(statusIds.contains(technician.getBizStatusId()),"["+technician.getName()+"]已被预约,暂时无法预约");
+        for (Technician technician : technicians) {
+            Preconditions.checkArgument(statusIds.contains(technician.getBizStatusId()), "[" + technician.getName() + "]已被预约,暂时无法预约");
         }
         Long id = orderEventService.addOrderForClient(orderParams, openId, roomId);
         if (id != null) {
@@ -93,10 +84,10 @@ public class OrderController extends BaseController {
         return wrapperJsonView(orderQueryService.getOrderDto(id));
     }
 
-    @RequestMapping(value = "/{id}/pay",method = {RequestMethod.POST, RequestMethod.OPTIONS})
+    @RequestMapping(value = "/{id}/pay", method = {RequestMethod.POST, RequestMethod.OPTIONS})
     @ApiMethodAttribute(nonSignatureValidation = true, nonSessionValidation = true)
     public Object pay(@PathVariable Long id) {
-        orderEventService.pay(id,null);
+        orderEventService.pay(id, null);
         return wrapperJsonView(true);
     }
 
@@ -120,38 +111,15 @@ public class OrderController extends BaseController {
     @ApiMethodAttribute(nonSignatureValidation = true, nonSessionValidation = true)
     public Object serve(@PathVariable Long detailId) {
         OrderDetail orderDetail = orderEventService.serve(detailId);
-        Preconditions.checkArgument(orderDetail != null, WarnMessage.NOT_FOUND_ORDER);
-        Order order = orderQueryService.getOrder(orderDetail.getOrderId());
-        Preconditions.checkArgument(order != null, WarnMessage.NOT_FOUND_ORDER);
-        PushClientParam pushClientParam = new PushClientParam();
-        pushClientParam.setOrderDetailId(orderDetail.getOrderId());
-        pushClientParam.setProjectId(orderDetail.getProjectId());
-        pushClientParam.setProjectName(orderDetail.getProjectName());
-        pushClientParam.setRoomId(orderDetail.getRoomId());
-        pushClientParam.setRoomName(orderDetail.getRoomName());
-        pushClientParam.setTechnicianId(orderDetail.getTechnicianId());
-        pushClientParam.setTechnicianName(orderDetail.getTechnicianName());
-        pushClientParam.setText(WarnMessage.TECHNICIAN_CONFIRM_ORDER);
-
-        MessageParam messageParam = new MessageParam();
-        messageParam.setJson(gson.toJson(pushClientParam));
-        messageParam.setMessage(WarnMessage.TECHNICIAN_CONFIRM_ORDER);
-        if (order.getWechatId() != null) {
-            messageParam.setReceiver(order.getWechatId());
-        }
-        if (order.getUserId() != null) {
-            messageParam.setReceiver(order.getUserId().toString());
-        }
-        mqProducer.send(messageParam);
         return wrapperJsonView(orderDetail.getRoomName());
     }
 
     @RequestMapping(value = "detail/{detailId}/technician/{technicianId}/access", method = {RequestMethod.POST, RequestMethod.OPTIONS})
     @ApiMethodAttribute(nonSignatureValidation = true, nonSessionValidation = true)
     public Object access(@PathVariable Long detailId, @PathVariable Long technicianId, @RequestBody AccessParam accessParam) {
-        Preconditions.checkArgument(accessParam.getGrade()!=null,"评价不存在");
-        Preconditions.checkArgument(accessParam.getOpenId()!=null,"openId不存在");
-        technicianEventService.assess(technicianId,detailId,accessParam.getGrade(),accessParam.getTags(),accessParam.getOpenId());
+        Preconditions.checkArgument(accessParam.getGrade() != null, "评价不存在");
+        Preconditions.checkArgument(accessParam.getOpenId() != null, "openId不存在");
+        technicianEventService.assess(technicianId, detailId, accessParam.getGrade(), accessParam.getTags(), accessParam.getOpenId());
         return wrapperJsonView(true);
     }
 

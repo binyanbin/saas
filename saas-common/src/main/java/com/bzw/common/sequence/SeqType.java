@@ -30,7 +30,8 @@ public enum SeqType {
     role("pl_role", "roleMapper"),
     roleFunction("pl_role_function", "roleFunctionMapper"),
     message("pl_message", "messageMapper"),
-    picture("pl_picture", "pictureMapper"),;
+    picture("pl_picture", "pictureMapper"),
+    sms("pl_sms","smsMapper");
 
     private String key;
     private String mapper;

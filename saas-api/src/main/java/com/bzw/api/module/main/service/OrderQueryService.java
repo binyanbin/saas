@@ -5,6 +5,7 @@ import com.bzw.api.module.main.biz.OrderQueryBiz;
 import com.bzw.api.module.main.biz.RoomQueryBiz;
 import com.bzw.api.module.main.dto.OrderDTO;
 import com.bzw.api.module.main.dto.OrderDetailDTO;
+import com.bzw.api.module.main.enums.OrderDetailState;
 import com.bzw.api.module.main.enums.OrderState;
 import com.bzw.api.module.base.model.Branch;
 import com.bzw.api.module.base.model.Order;
@@ -136,6 +137,8 @@ public class OrderQueryService {
             orderDetailDTO.setRoomName(orderDetail.getRoomName());
             orderDetailDTO.setTechnicianId(orderDetail.getTechnicianId());
             orderDetailDTO.setTechnicianName(orderDetail.getTechnicianName());
+            orderDetailDTO.setStateId(orderDetail.getBizStatusId());
+            orderDetailDTO.setStateName(OrderDetailState.parse(orderDetail.getBizStatusId()).getDesc());
             detailDTOList.add(orderDetailDTO);
         }
         return detailDTOList;

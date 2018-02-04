@@ -1,10 +1,13 @@
 package com.bzw.api.module.main.controller;
 
+import com.bzw.api.module.base.model.Employee;
+import com.bzw.api.module.base.model.User;
+import com.bzw.api.module.main.constant.WarnMessage;
 import com.bzw.api.module.main.params.LoginParam;
 import com.bzw.api.module.main.service.CustomerQueryService;
 import com.bzw.api.module.main.service.OrderQueryService;
-import com.bzw.api.module.third.service.SmsService;
 import com.bzw.api.module.third.service.BaiduService;
+import com.bzw.api.module.third.service.SmsService;
 import com.bzw.api.module.third.service.WcService;
 import com.bzw.common.content.ApiMethodAttribute;
 import com.bzw.common.exception.api.UserLoginFailException;
@@ -12,11 +15,13 @@ import com.bzw.common.utils.WebUtils;
 import com.bzw.common.web.BaseController;
 import com.google.common.base.Preconditions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author yanbin
@@ -43,8 +48,14 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/{phone}/smscode", method = {RequestMethod.OPTIONS, RequestMethod.POST})
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
     public Object getSmsCode(@PathVariable String phone) throws ParserConfigurationException, SAXException, IOException {
-        Preconditions.checkArgument(customerQueryService.containPhone(phone), "系统不存在该手机号");
-        return wrapperJsonView(smsService.sendSms(phone));
+        List<User> users = customerQueryService.listUsersByPhone(phone);
+        Preconditions.checkArgument(!CollectionUtils.isEmpty(users), WarnMessage.NOT_EXISTS_PHONE);
+        Employee employee = customerQueryService.getEmployeeByUsers(users);
+        if (employee != null) {
+            return wrapperJsonView(smsService.sendSms(phone, employee.getTenantId(), employee.getBranchId()));
+        } else {
+            return wrapperJsonView(smsService.sendSms(phone));
+        }
     }
 
     @RequestMapping(value = "/login", method = {RequestMethod.OPTIONS, RequestMethod.POST})

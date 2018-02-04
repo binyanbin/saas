@@ -18,6 +18,8 @@ public class SmsConstants {
     @Value("${sms.chanel}")
     private String chanel;
 
+    private final String smsCode = "验证码:%S";
+
     public String getAccount() {
         return account;
     }
@@ -28,5 +30,9 @@ public class SmsConstants {
 
     public String getChanel() {
         return chanel;
+    }
+
+    public String getSmsCode() {
+        return smsCode;
     }
 }
