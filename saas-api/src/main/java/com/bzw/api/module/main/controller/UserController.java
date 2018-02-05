@@ -4,7 +4,7 @@ import com.bzw.api.module.base.model.Employee;
 import com.bzw.api.module.base.model.User;
 import com.bzw.api.module.main.constant.WarnMessage;
 import com.bzw.api.module.main.params.LoginParam;
-import com.bzw.api.module.main.service.CustomerQueryService;
+import com.bzw.api.module.main.service.UserQueryService;
 import com.bzw.api.module.main.service.OrderQueryService;
 import com.bzw.api.module.third.service.BaiduService;
 import com.bzw.api.module.third.service.SmsService;
@@ -34,7 +34,7 @@ public class UserController extends BaseController {
     private BaiduService.CustomerEventService customerEventService;
 
     @Autowired
-    private CustomerQueryService customerQueryService;
+    private UserQueryService userQueryService;
 
     @Autowired
     private OrderQueryService orderQueryService;
@@ -48,9 +48,9 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/{phone}/smscode", method = {RequestMethod.OPTIONS, RequestMethod.POST})
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
     public Object getSmsCode(@PathVariable String phone) throws ParserConfigurationException, SAXException, IOException {
-        List<User> users = customerQueryService.listUsersByPhone(phone);
+        List<User> users = userQueryService.listUsersByPhone(phone);
         Preconditions.checkArgument(!CollectionUtils.isEmpty(users), WarnMessage.NOT_EXISTS_PHONE);
-        Employee employee = customerQueryService.getEmployeeByUsers(users);
+        Employee employee = userQueryService.getEmployeeByUsers(users);
         if (employee != null) {
             return wrapperJsonView(smsService.sendSms(phone, employee.getTenantId(), employee.getBranchId()));
         } else {

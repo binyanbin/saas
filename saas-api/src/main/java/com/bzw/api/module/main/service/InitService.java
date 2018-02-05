@@ -205,7 +205,7 @@ public class InitService {
             room.setHaveRestroom(Byte.parseByte("1"));
             room.setModifiedId(0L);
             room.setModifiedTime(now);
-            room.setNumber(roomNum[i]);
+            room.setName(roomNum[i]);
             room.setStatusId(Status.Valid.getValue());
             room.setBranchName(branch.getName());
             if (i <= 3) {

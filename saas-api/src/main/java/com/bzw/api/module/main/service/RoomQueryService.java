@@ -51,10 +51,10 @@ public class RoomQueryService {
         return result;
     }
 
-    private RoomDTO mapToRoomDto(Room room) {
+    public RoomDTO mapToRoomDto(Room room) {
         RoomDTO roomDTO = new RoomDTO();
         roomDTO.setId(room.getId());
-        roomDTO.setName(room.getNumber());
+        roomDTO.setName(room.getName());
         roomDTO.setBizStatusName(RoomState.parse(room.getBizStatusId()).getDesc());
         roomDTO.setBizStatusId(room.getBizStatusId());
         roomDTO.setHaveRestRoom(room.getHaveRestroom() == 1);

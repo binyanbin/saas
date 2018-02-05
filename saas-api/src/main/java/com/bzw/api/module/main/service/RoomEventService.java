@@ -4,10 +4,13 @@ import com.bzw.api.module.base.model.*;
 import com.bzw.api.module.main.biz.*;
 import com.bzw.api.module.main.constant.LogConstants;
 import com.bzw.api.module.main.constant.WarnMessage;
+import com.bzw.api.module.main.dto.RoomDTO;
 import com.bzw.api.module.main.enums.OrderDetailState;
 import com.bzw.api.module.main.enums.OrderState;
 import com.bzw.api.module.main.enums.RecordChangeType;
 import com.bzw.api.module.main.enums.RoomState;
+import com.bzw.api.module.main.params.RoomParam;
+import com.bzw.common.enums.Status;
 import com.bzw.common.sequence.ISequence;
 import com.bzw.common.sequence.SeqType;
 import com.bzw.common.utils.DtUtils;
@@ -57,6 +60,9 @@ public class RoomEventService {
 
     @Autowired
     private TechnicianEventService technicianEventService;
+
+    @Autowired
+    private RoomQueryService roomQueryService;
 
     /**
      * 开房
@@ -201,5 +207,57 @@ public class RoomEventService {
         } else {
             return false;
         }
+    }
+
+    public RoomDTO add(RoomParam roomParam, Long branchId, String branchName, Long tenantId, Long employeeId) {
+        Date now = new Date();
+        Room room = new Room();
+        room.setId(sequenceService.newKey(SeqType.room));
+        if (roomParam.getHaveRestroom()) {
+            room.setHaveRestroom(Byte.parseByte("1"));
+        } else {
+            room.setHaveRestroom(Byte.parseByte("0"));
+        }
+        room.setName(roomParam.getName());
+        room.setDescription(roomParam.getDescription());
+        room.setBedNumber(roomParam.getBedNumber());
+        room.setType(roomParam.getType());
+        room.setVersionId(0);
+        room.setBizStatusId(RoomState.free.getValue());
+        room.setBranchId(branchId);
+        room.setBranchName(branchName);
+        room.setModifiedId(employeeId);
+        room.setModifiedTime(now);
+        room.setCreatedId(employeeId);
+        room.setCreatedTime(now);
+        room.setTenantId(tenantId);
+        room.setStatusId(Status.Valid.getValue());
+        roomEventBiz.add(room);
+        return roomQueryService.mapToRoomDto(room);
+    }
+
+    public boolean update(RoomParam roomParam, Long id, Long employeeId) {
+        Room room = roomQueryBiz.getRoom(id);
+        if (room.getStatusId().equals(Status.Delete.getValue())){
+            return false;
+        }
+        Date now = new Date();
+        if (roomParam.getHaveRestroom()) {
+            room.setHaveRestroom(Byte.parseByte("1"));
+        } else {
+            room.setHaveRestroom(Byte.parseByte("0"));
+        }
+        room.setId(id);
+        room.setName(roomParam.getName());
+        room.setDescription(roomParam.getDescription());
+        room.setBedNumber(roomParam.getBedNumber());
+        room.setType(roomParam.getType());
+        room.setModifiedId(employeeId);
+        room.setModifiedTime(now);
+        return roomEventBiz.update(room);
+    }
+
+    public boolean delete(Long id) {
+        return roomEventBiz.delete(id);
     }
 }

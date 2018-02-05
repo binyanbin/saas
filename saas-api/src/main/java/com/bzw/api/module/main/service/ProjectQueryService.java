@@ -1,19 +1,13 @@
 package com.bzw.api.module.main.service;
 
-import com.bzw.api.module.base.model.Branch;
-import com.bzw.api.module.base.model.Employee;
 import com.bzw.api.module.base.model.Project;
-import com.bzw.api.module.base.model.User;
 import com.bzw.api.module.main.biz.ProjectQueryBiz;
-import com.bzw.api.module.main.biz.RoomQueryBiz;
-import com.bzw.api.module.main.biz.UserQueryBiz;
-import com.bzw.api.module.main.dto.BranchDTO;
+import com.bzw.api.module.main.dto.IdName;
 import com.bzw.api.module.main.dto.ProjectDTO;
 import com.bzw.api.module.main.enums.ProjectType;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -21,34 +15,10 @@ import java.util.List;
  * @author yanbin
  */
 @Service
-public class CustomerQueryService {
-
-    @Autowired
-    private RoomQueryBiz roomQueryBiz;
+public class ProjectQueryService {
 
     @Autowired
     private ProjectQueryBiz projectQueryBiz;
-
-    @Autowired
-    private UserQueryBiz userQueryBiz;
-
-    public BranchDTO getBranchByRoomId(Long roomId) {
-        Branch branch = roomQueryBiz.getBranchByRoomId(roomId);
-        if (branch == null) {
-            return null;
-        } else {
-            BranchDTO result = new BranchDTO();
-            result.setId(branch.getId());
-            result.setAddress(branch.getAddress());
-            result.setName(branch.getName());
-            result.setTelephone(branch.getTelephone());
-            return result;
-        }
-    }
-
-    public List<User> listUsersByPhone(String phone) {
-        return userQueryBiz.listUserByPhone(phone);
-    }
 
     public List<ProjectDTO> listProjectsByBranchId(Long branchId) {
         List<Project> projectList = projectQueryBiz.listProjectByBranchId(branchId);
@@ -57,6 +27,18 @@ public class CustomerQueryService {
 
     public ProjectDTO getProject(Integer projectId) {
         return mapToProjectDto(projectQueryBiz.getProject(projectId));
+    }
+
+    public List<IdName> listType(){
+        List<IdName> result = Lists.newArrayList();
+        ProjectType[] types = ProjectType.values();
+        for(ProjectType projectType : types){
+            IdName idName = new IdName();
+            idName.setId(projectType.getValue());
+            idName.setName(projectType.getDesc());
+            result.add(idName);
+        }
+        return result;
     }
 
     public List<ProjectDTO> listProjectsByRoomId(Long roomId) {
@@ -72,7 +54,7 @@ public class CustomerQueryService {
         return result;
     }
 
-    private ProjectDTO mapToProjectDto(Project project) {
+    public ProjectDTO mapToProjectDto(Project project) {
         ProjectDTO projectDTO = new ProjectDTO();
         projectDTO.setId(project.getId());
         projectDTO.setName(project.getName());
@@ -82,15 +64,6 @@ public class CustomerQueryService {
         projectDTO.setDuration(project.getDuration());
         projectDTO.setDescription(project.getDescription());
         return projectDTO;
-    }
-
-    public Employee getEmployeeByUsers(List<User> users){
-        List<Employee> employees = userQueryBiz.listEmployeeByUsers(users);
-        if (!CollectionUtils.isEmpty(employees)){
-            return employees.get(0);
-        } else{
-            return null;
-        }
     }
 
 }

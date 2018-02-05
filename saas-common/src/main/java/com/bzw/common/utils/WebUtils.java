@@ -112,7 +112,6 @@ public final class WebUtils {
             return null;
         }
 
-
         public static Long getUserId() {
             WebSession session = get();
             assert session != null;
@@ -125,7 +124,6 @@ public final class WebUtils {
             return session.getEmployeeId();
         }
 
-
         public static String getSecretKey() {
             WebSession session = get();
             assert session != null;
@@ -136,6 +134,24 @@ public final class WebUtils {
             WebSession session = get();
             assert session != null;
             return session.getTenantId();
+        }
+
+        public static String getTenantName(){
+            WebSession session = get();
+            assert session != null;
+            return session.getTenantName();
+        }
+
+        public static Long getBranchId(){
+            WebSession session = get();
+            assert session != null;
+            return session.getBranchId();
+        }
+
+        public static String getBranchName(){
+            WebSession session = get();
+            assert session != null;
+            return session.getBranchName();
         }
     }
 }

@@ -201,11 +201,11 @@ public class OrderEventService {
         technician.setStartTime(now);
         technician.setOverTime(overTime);
         technician.setRoomId(room.getId());
-        technician.setRoomName(room.getNumber());
+        technician.setRoomName(room.getName());
         orderDetail.setBeginTime(now);
         orderDetail.setEndTime(overTime);
         orderDetail.setRoomId(room.getId());
-        orderDetail.setRoomName(room.getNumber());
+        orderDetail.setRoomName(room.getName());
         orderDetail.setBizStatusId(OrderDetailState.Serving.getValue());
         roomEventBiz.update(room);
         technicianEventBiz.updateTechnician(technician);
@@ -215,7 +215,7 @@ public class OrderEventService {
         pushClientParam.setProjectId(project.getId());
         pushClientParam.setProjectName(project.getName());
         pushClientParam.setRoomId(room.getId());
-        pushClientParam.setRoomName(room.getNumber());
+        pushClientParam.setRoomName(room.getName());
         pushClientParam.setTechnicianId(technician.getId());
         pushClientParam.setTechnicianName(technician.getName());
         pushClientParam.setOrderDetailId(orderDetailId);
@@ -323,7 +323,7 @@ public class OrderEventService {
                 orderDetail.setPrice(project.getPrice());
                 orderDetail.setProjectName(project.getName());
                 orderDetail.setTechnicianName(technician.getName());
-                orderDetail.setRoomName(room.getNumber());
+                orderDetail.setRoomName(room.getName());
                 orderDetail.setTypeId(OrderType.CustomerReservation.getValue());
                 orderDetail.setDuration(project.getDuration());
                 orderDetails.add(orderDetail);
@@ -332,11 +332,11 @@ public class OrderEventService {
                 pushTechnicianParam.setDetailId(orderDetail.getId());
                 pushTechnicianParam.setTechnicianName(technician.getName());
                 pushTechnicianParam.setRoomId(room.getId());
-                pushTechnicianParam.setRoomName(room.getNumber());
+                pushTechnicianParam.setRoomName(room.getName());
                 pushTechnicianParam.setProjectId(project.getId());
                 pushTechnicianParam.setProjectName(project.getName());
                 pushTechnicianParam.setTechnicianId(technician.getId());
-                pushTechnicianParam.setTxt("请技师" + technician.getName() + "去" + room.getNumber() + "上钟");
+                pushTechnicianParam.setTxt("请技师" + technician.getName() + "去" + room.getName() + "上钟");
                 pushTechnicianParams.add(pushTechnicianParam);
             }
         }
