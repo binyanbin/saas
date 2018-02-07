@@ -3,6 +3,9 @@ package com.bzw.common.utils;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 
+/**
+ * @author yanbin
+ */
 public class Md5 {
 
     public static String getMD5Str(byte[] bytes) {

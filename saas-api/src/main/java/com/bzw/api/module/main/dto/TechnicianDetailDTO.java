@@ -11,7 +11,16 @@ public class TechnicianDetailDTO extends TechnicianDTO {
     private List<String> spa;
     private List<String> massage;
     private List<String> tags;
-    private List<String> photos;
+    private List<TechnicianPhotoDTO> photos;
+    private List<ProjectDTO> projects;
+
+    public List<ProjectDTO> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(List<ProjectDTO> projects) {
+        this.projects = projects;
+    }
 
     public TechnicianDetailDTO(){
         spa = Lists.newArrayList();
@@ -44,11 +53,11 @@ public class TechnicianDetailDTO extends TechnicianDTO {
         this.tags = tags;
     }
 
-    public List<String> getPhotos() {
+    public List<TechnicianPhotoDTO> getPhotos() {
         return photos;
     }
 
-    public void setPhotos(List<String> photos) {
+    public void setPhotos(List<TechnicianPhotoDTO> photos) {
         this.photos = photos;
     }
 

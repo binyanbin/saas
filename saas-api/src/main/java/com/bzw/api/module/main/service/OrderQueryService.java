@@ -52,8 +52,9 @@ public class OrderQueryService {
             result.setDetails(mapToOrderDetailDto(orderDetails));
             return result;
         }
-        else
+        else {
             return null;
+        }
     }
 
     public Order getOrder(Long orderId){

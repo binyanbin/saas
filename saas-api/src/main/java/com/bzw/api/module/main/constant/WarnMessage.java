@@ -21,4 +21,5 @@ public class WarnMessage {
     public static final String DELETE_FAIL = "id不存在，删除失败";
     public static final String UPDATE_SUCCESS = "修改成功";
     public static final String UPDATE_FAIL = "id不存在，修改失败";
+    public static final String SERVICE_BEGIN = "已服务，无法修改订单";
 }

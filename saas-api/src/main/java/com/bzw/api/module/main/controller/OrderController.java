@@ -10,7 +10,6 @@ import com.bzw.api.module.main.service.OrderEventService;
 import com.bzw.api.module.main.service.OrderQueryService;
 import com.bzw.api.module.main.service.TechnicianEventService;
 import com.bzw.api.module.main.service.TechnicianQueryService;
-import com.bzw.api.module.mq.service.MqProducer;
 import com.bzw.common.content.ApiMethodAttribute;
 import com.bzw.common.content.DuplicationSubmit;
 import com.bzw.common.enums.BusinessType;
@@ -18,7 +17,6 @@ import com.bzw.common.utils.WebUtils;
 import com.bzw.common.web.BaseController;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -45,11 +43,14 @@ public class OrderController extends BaseController {
     @Autowired
     private TechnicianQueryService technicianQueryService;
 
+    private final String NO_TECHNICIAN = "没有选择技师";
+    private final String TECHNICIAN_ORDER = "[%s]已被预约,暂时无法预约";
+
     @RequestMapping(value = "room/{roomId}/clientBook", method = {RequestMethod.POST, RequestMethod.OPTIONS})
     @ApiMethodAttribute(nonSignatureValidation = true, nonSessionValidation = true)
     public Object clientBook(@RequestBody List<OrderParam> orderParams, @PathVariable Long roomId, @RequestParam String openId) {
-        Preconditions.checkArgument(StringUtils.isNotBlank(openId), "openId不存在");
-        Preconditions.checkArgument(!CollectionUtils.isEmpty(orderParams), "没有选择技师");
+        Preconditions.checkArgument(StringUtils.isNotBlank(openId), NO_OPENID);
+        Preconditions.checkArgument(!CollectionUtils.isEmpty(orderParams), NO_TECHNICIAN);
         List<Long> technicianIds = Lists.newArrayList();
         for (OrderParam orderParam : orderParams) {
             technicianIds.add(orderParam.getTechnicianId());
@@ -59,7 +60,7 @@ public class OrderController extends BaseController {
         statusIds.add(TechnicianState.serving.getValue());
         List<Technician> technicians = technicianQueryService.listTechnicianByIds(technicianIds);
         for (Technician technician : technicians) {
-            Preconditions.checkArgument(statusIds.contains(technician.getBizStatusId()), "[" + technician.getName() + "]已被预约,暂时无法预约");
+            Preconditions.checkArgument(statusIds.contains(technician.getBizStatusId()), String.format(TECHNICIAN_ORDER, technician.getName()));
         }
         Long id = orderEventService.addOrderForClient(orderParams, openId, roomId);
         if (id != null) {
@@ -114,11 +115,14 @@ public class OrderController extends BaseController {
         return wrapperJsonView(orderDetail.getRoomName());
     }
 
+    private final String NO_ACCESS = "评价不存在";
+    private final String NO_OPENID = "openId不存在";
+
     @RequestMapping(value = "detail/{detailId}/technician/{technicianId}/access", method = {RequestMethod.POST, RequestMethod.OPTIONS})
     @ApiMethodAttribute(nonSignatureValidation = true, nonSessionValidation = true)
     public Object access(@PathVariable Long detailId, @PathVariable Long technicianId, @RequestBody AccessParam accessParam) {
-        Preconditions.checkArgument(accessParam.getGrade() != null, "评价不存在");
-        Preconditions.checkArgument(accessParam.getOpenId() != null, "openId不存在");
+        Preconditions.checkArgument(accessParam.getGrade() != null, NO_ACCESS);
+        Preconditions.checkArgument(!StringUtils.isNotBlank(accessParam.getOpenId()), NO_OPENID);
         technicianEventService.assess(technicianId, detailId, accessParam.getGrade(), accessParam.getTags(), accessParam.getOpenId());
         return wrapperJsonView(true);
     }

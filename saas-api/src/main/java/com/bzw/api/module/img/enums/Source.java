@@ -1,7 +1,12 @@
 package com.bzw.api.module.img.enums;
 
+/**
+ * @author yanbin
+ */
 public enum Source {
-
+    /**
+     * 来源
+     */
     api(1, "api"),
     ;
 

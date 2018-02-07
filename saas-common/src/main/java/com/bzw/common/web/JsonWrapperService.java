@@ -14,6 +14,9 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 
+/**
+ * @author yanbin
+ */
 @Service
 public class JsonWrapperService {
 
@@ -34,7 +37,15 @@ public class JsonWrapperService {
                 || ex instanceof MethodArgumentTypeMismatchException) {
             result.setCode(ApplicationErrorCode.ArgumentsIncorrect.getCode());
             result.setMsg(ex.getMessage());
-        } else if (ex instanceof IOException) {
+        } else if (ex instanceof IllegalStateException){
+            result.setCode(ApplicationErrorCode.IllegalStateException.getCode());
+            result.setMsg(ex.getMessage());
+        }
+        else if (ex instanceof NullPointerException){
+            result.setCode(ApplicationErrorCode.NullPointerException.getCode());
+            result.setMsg(ex.getMessage());
+        }
+        else if (ex instanceof IOException) {
             result.setCode(ApplicationErrorCode.IOException.getCode());
             result.setMsg(ex.getMessage());
         } else if (ex instanceof NoHandlerFoundException) {

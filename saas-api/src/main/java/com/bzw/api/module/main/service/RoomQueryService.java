@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * @author yanbin
+ */
 @Service
 public class RoomQueryService {
 
@@ -63,6 +66,7 @@ public class RoomQueryService {
         roomDTO.setBedNumber(room.getBedNumber());
         roomDTO.setStartTime(room.getStartTime());
         roomDTO.setOverTime(room.getOverTime());
+        roomDTO.setDescription(room.getDescription());
         return roomDTO;
     }
 

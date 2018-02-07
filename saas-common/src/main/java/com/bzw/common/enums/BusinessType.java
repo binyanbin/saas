@@ -1,6 +1,12 @@
 package com.bzw.common.enums;
 
+/**
+ * @author yanbin
+ */
 public enum BusinessType {
+    /**
+     * 业务
+     */
     NULL(-1,"无"),
     weChatOrder(1, "微信预定"),
     appOrder(2,"app预定"),

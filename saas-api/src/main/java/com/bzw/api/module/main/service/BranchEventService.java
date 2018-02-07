@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
+/**
+ * @author yanbin
+ */
 @Service
 public class BranchEventService {
 
@@ -59,7 +62,7 @@ public class BranchEventService {
         return branchEventBiz.update(branch);
     }
 
-    public boolean delete(Long id) {
-        return branchEventBiz.delete(id);
+    public boolean delete(Long id,Long employeeId) {
+        return branchEventBiz.delete(id,employeeId);
     }
 }

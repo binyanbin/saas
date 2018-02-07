@@ -1,6 +1,6 @@
 package com.bzw.api.module.third.service;
 
-import com.bzw.api.module.main.constant.ExternalUrl;
+import com.bzw.api.module.mq.constants.ExternalUrl;
 import com.bzw.api.module.third.dto.WsAccessTokenDTO;
 import com.bzw.api.module.third.dto.WsLoginDTO;
 import com.bzw.api.module.third.dto.WsResult;

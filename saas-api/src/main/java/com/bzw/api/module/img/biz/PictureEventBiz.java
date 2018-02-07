@@ -13,8 +13,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
+/**
+ * @author yanbin
+ */
 @Service
-public class PicutreEventBiz {
+public class PictureEventBiz {
 
     @Autowired
     private PictureMapper pictureMapper;
@@ -36,5 +39,9 @@ public class PicutreEventBiz {
         picture.setSize(size);
         pictureMapper.insert(picture);
         return picture.getImageId();
+    }
+
+    public boolean update(Picture picture){
+        return  pictureMapper.updateByPrimaryKey(picture)>0;
     }
 }

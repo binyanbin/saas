@@ -23,7 +23,7 @@ import java.util.Objects;
 @Component
 public class WebSocket {
 
-    private static final String pushUrl = "mq/push?receiver=";
+    private static final String PUSH_URL = "mq/push?receiver=";
 
     private static int onlineCount = 0;
 
@@ -47,7 +47,7 @@ public class WebSocket {
                 webSocketMap.put(strArray[1], webSockets);
             }
             addOnlineCount();
-            String url = "http://" + session.getRequestURI().getAuthority() + "/" + pushUrl + strArray[1];
+            String url = "http://" + session.getRequestURI().getAuthority() + "/" + PUSH_URL + strArray[1];
             HttpClient.get(url);
         }
     }
@@ -100,7 +100,6 @@ public class WebSocket {
                     webSocket.sendMessage(message);
                     result = true;
                 } catch (Exception ex) {
-//                    System.out.println(ex.getMessage());
                     sockets.remove(i--);
                 }
             }

@@ -7,6 +7,8 @@ import com.bzw.api.module.third.service.WcService;
 import com.bzw.common.content.ApiMethodAttribute;
 import com.bzw.common.utils.WebUtils;
 import com.bzw.common.web.BaseController;
+import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,9 +22,6 @@ import java.io.OutputStream;
 @RestController
 @RequestMapping("rooms")
 public class RoomController extends BaseController {
-
-    @Autowired
-    private UserQueryService userQueryService;
 
     @Autowired
     private RoomEventService roomEventService;
@@ -104,18 +103,32 @@ public class RoomController extends BaseController {
     @RequestMapping(value = "/", method = {RequestMethod.POST, RequestMethod.OPTIONS})
     @ApiMethodAttribute(nonSignatureValidation = true)
     public Object add(@RequestBody RoomParam roomParam) {
+        checkPostRoomParams(roomParam);
         return wrapperJsonView(roomEventService.add(roomParam, WebUtils.Session.getBranchId(), WebUtils.Session.getBranchName(), WebUtils.Session.getTenantId(), WebUtils.Session.getEmployeeId()));
     }
 
-    @RequestMapping(value = "{roomId}/update", method = {RequestMethod.POST, RequestMethod.OPTIONS})
+    @RequestMapping(value = "/{roomId}", method = {RequestMethod.POST, RequestMethod.OPTIONS})
     @ApiMethodAttribute(nonSignatureValidation = true)
     public Object update(@RequestBody RoomParam roomParam, @PathVariable Long roomId) {
+        checkPostRoomParams(roomParam);
         boolean result = roomEventService.update(roomParam, roomId, WebUtils.Session.getEmployeeId());
         if (result) {
             return wrapperJsonView(true, WarnMessage.DELETE_SUCCESS);
         } else {
             return wrapperJsonView(false, WarnMessage.DELETE_FAIL);
         }
+    }
+
+    private final String NO_PARAMETER = "房间内容不存在";
+    private final String NO_ROOM_NUMBER = "房间床数必填";
+    private final String NO_ROOM_NAME = "房号必填";
+    private final String NO_ROOM_TYPE = "房间类型必填";
+
+    private void checkPostRoomParams(@RequestBody RoomParam roomParam) {
+        Preconditions.checkArgument(roomParam != null, NO_PARAMETER);
+        Preconditions.checkArgument(roomParam.getBedNumber() != null, NO_ROOM_NUMBER);
+        Preconditions.checkArgument(StringUtils.isNotBlank(roomParam.getName()), NO_ROOM_NAME);
+        Preconditions.checkArgument(roomParam.getType() != null, NO_ROOM_TYPE);
     }
 
     @RequestMapping(value = "type", method = {RequestMethod.GET})
@@ -126,8 +139,8 @@ public class RoomController extends BaseController {
 
     @RequestMapping(value = "{roomId}", method = {RequestMethod.DELETE, RequestMethod.OPTIONS})
     @ApiMethodAttribute(nonSignatureValidation = true)
-    public Object add(@PathVariable Long roomId) {
-        boolean result = roomEventService.delete(roomId);
+    public Object delete(@PathVariable Long roomId) {
+        boolean result = roomEventService.delete(roomId, WebUtils.Session.getEmployeeId());
         if (result) {
             return wrapperJsonView(true, WarnMessage.DELETE_SUCCESS);
         } else {

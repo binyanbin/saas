@@ -12,9 +12,9 @@ public class DtUtils {
 
     private final static DateFormat DAY_NUMBER = new SimpleDateFormat("yyyyMMdd");
     private final static DateFormat TIME_NUMBER = new SimpleDateFormat("yyyyMMddhhmmssSSS");
-    private final static DateFormat Time_STRING = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private final static DateFormat TIME_STRING = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     public static String toDateString(Date date) {
-        return Time_STRING.format(date);
+        return TIME_STRING.format(date);
     }
 
     public static String toDayNumber(Date date) {

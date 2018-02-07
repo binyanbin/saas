@@ -1,9 +1,11 @@
 package com.bzw.api.module.img.service;
 
-import com.bzw.api.module.img.constants.Constants;
-import com.bzw.api.module.img.biz.PictureQueryBiz;
-import com.bzw.api.module.img.biz.PicutreEventBiz;
 import com.bzw.api.module.base.model.Picture;
+import com.bzw.api.module.img.biz.PictureEventBiz;
+import com.bzw.api.module.img.biz.PictureQueryBiz;
+import com.bzw.api.module.img.constants.Constants;
+import com.bzw.api.module.img.dto.ImageDTO;
+import com.bzw.common.enums.Status;
 import com.bzw.common.exception.api.NotFoundImageException;
 import com.bzw.common.utils.DtUtils;
 import com.bzw.common.utils.Image;
@@ -21,11 +23,14 @@ import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * @author yanbin
+ */
 @Service
 public class ImageService {
 
     @Autowired
-    private PicutreEventBiz picutreEventBiz;
+    private PictureEventBiz pictureEventBiz;
 
     @Autowired
     private PictureQueryBiz pictureQueryBiz;
@@ -33,7 +38,7 @@ public class ImageService {
     @Autowired
     private Constants constants;
 
-    public String saveImage(BufferedImage originalImage, Long tenantId, Long size) throws IOException, ExecutionException, InterruptedException {
+    public ImageDTO saveImage(BufferedImage originalImage, Long tenantId, Long size) throws IOException, ExecutionException, InterruptedException {
         String fileName = UuidUtil.newUuidString();
         String date = DtUtils.toDayNumber(new Date());
         String todayFolder = constants.getLibPath() + "/" + date;
@@ -45,9 +50,9 @@ public class ImageService {
         String imageFilePath = todayFolder + "/" + fileName + "_" + constants.getMaxWidth().toString() + ".jpg";
         CompletableFuture<Boolean> isSave = saveImage(originalImage, originalImageFilePath, imageFilePath);
 
-        String imgId = picutreEventBiz.add(imageFilePath, originalImageFilePath, tenantId, size);
+        String imgId = pictureEventBiz.add(imageFilePath, originalImageFilePath, tenantId, size);
         if (isSave.get()) {
-            return constants.getUrl() + imgId;
+            return new ImageDTO(imgId,constants.getUrl() + imgId);
         } else {
             return null;
         }
@@ -66,6 +71,16 @@ public class ImageService {
             ImageIO.write(resizedImage, "jpg", imageFile);
         }
         return CompletableFuture.completedFuture(true);
+    }
+
+    public boolean delete(String imageId) {
+        Picture picture = pictureQueryBiz.getPicture(imageId);
+        if (picture != null) {
+            return false;
+        } else {
+            picture.setStatusId(Status.Delete.getValue());
+            return pictureEventBiz.update(picture);
+        }
     }
 
     public byte[] getBytesByImageId(String imageId, Integer width) throws IOException {

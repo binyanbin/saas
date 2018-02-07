@@ -6,14 +6,11 @@ import com.bzw.api.module.base.dao.TechnicianProjectMapper;
 import com.bzw.api.module.base.model.*;
 import com.bzw.common.enums.Status;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author yanbin
@@ -30,41 +27,12 @@ public class TechnicianQueryBiz {
     @Autowired
     private TechnicianPhotoMapper technicianPhotoMapper;
 
-    public List<String> listTechnicianPhotoById(Long technicianId) {
-        List<String> result = Lists.newArrayList();
+    public List<TechnicianPhoto> listPhotoByTechnicianId(Long technicianId) {
         TechnicianPhotoExample example = new TechnicianPhotoExample();
         example.createCriteria().andTechnicianIdEqualTo(technicianId);
-        List<TechnicianPhoto> technicianPhotos = technicianPhotoMapper.selectByExample(example);
-        for (TechnicianPhoto technicianPhoto : technicianPhotos) {
-            result.add(technicianPhoto.getUrl());
-        }
-        return result;
+        return technicianPhotoMapper.selectByExample(example);
     }
 
-    public Map<Long, List<String>> listTechnicianPhotoByIds(List<Long> technicianIds) {
-        Map<Long, List<String>> result = Maps.newHashMap();
-        TechnicianPhotoExample example = new TechnicianPhotoExample();
-        example.createCriteria().andTechnicianIdIn(technicianIds);
-        List<TechnicianPhoto> technicianPhotos = technicianPhotoMapper.selectByExample(example);
-        if (CollectionUtils.isEmpty(technicianPhotos)) {
-            return result;
-        }
-        for (TechnicianPhoto technicianPhoto : technicianPhotos) {
-            if (StringUtils.isNotBlank(technicianPhoto.getUrl())) {
-                if (result.containsKey(technicianPhoto.getTechnicianId())) {
-                    List<String> photos = result.get(technicianPhoto.getTechnicianId());
-                    if (!photos.contains(technicianPhoto.getUrl())) {
-                        photos.add(technicianPhoto.getUrl());
-                    }
-                } else {
-                    List<String> photos = Lists.newArrayList();
-                    photos.add(technicianPhoto.getUrl());
-                    result.put(technicianPhoto.getTechnicianId(), photos);
-                }
-            }
-        }
-        return result;
-    }
 
     public Technician getTechnicianById(Long technicianId) {
         return technicianMapper.selectByPrimaryKey(technicianId);

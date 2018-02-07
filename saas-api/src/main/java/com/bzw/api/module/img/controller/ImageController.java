@@ -1,6 +1,7 @@
 package com.bzw.api.module.img.controller;
 
 import com.bzw.api.module.img.service.ImageService;
+import com.bzw.api.module.main.constant.WarnMessage;
 import com.bzw.common.content.ApiMethodAttribute;
 import com.bzw.common.exception.api.NotFoundImageException;
 import com.bzw.common.web.BaseController;
@@ -16,6 +17,9 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * @author yanbin
+ */
 @RestController
 @RequestMapping("img")
 public class ImageController extends BaseController {
@@ -30,10 +34,10 @@ public class ImageController extends BaseController {
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
     public Object upload(@RequestParam("img") MultipartFile uploadFile) throws IOException, ExecutionException, InterruptedException {
         BufferedImage originalImage = ImageIO.read(uploadFile.getInputStream());
-        return wrapperJsonView(imageService.saveImage(originalImage,0L,uploadFile.getSize()));
+        return wrapperJsonView(imageService.saveImage(originalImage, 0L, uploadFile.getSize()));
     }
 
-    @RequestMapping(value = "{imageId}", produces = MediaType.IMAGE_PNG_VALUE)
+    @RequestMapping(value = "{imageId}", method = {RequestMethod.GET}, produces = MediaType.IMAGE_PNG_VALUE)
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
     public byte[] get(@PathVariable("imageId") String imageId, HttpServletResponse response) throws IOException {
         try {
@@ -44,20 +48,20 @@ public class ImageController extends BaseController {
         }
     }
 
-    @RequestMapping(value = "{imageId}/{width}", produces = MediaType.IMAGE_PNG_VALUE)
+    @RequestMapping(value = "{imageId}", method = {RequestMethod.DELETE, RequestMethod.OPTIONS}, produces = MediaType.IMAGE_PNG_VALUE)
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
-    public byte[] get(@PathVariable("imageId") String imageId,@PathVariable Integer width, HttpServletResponse response) throws IOException {
-        try {
-            return imageService.getBytesByImageId(imageId,width);
-        } catch (Exception e) {
-            response.sendRedirect("/img/404");
-            return null;
+    public Object delete(@PathVariable("imageId") String imageId) {
+        boolean result = imageService.delete(imageId);
+        if (result) {
+            return wrapperJsonView(true, WarnMessage.DELETE_SUCCESS);
+        } else {
+            return wrapperJsonView(false, WarnMessage.DELETE_FAIL);
         }
     }
 
-    @RequestMapping(value = "{imageId}/standard", produces = MediaType.IMAGE_PNG_VALUE)
+    @RequestMapping(value = "{imageId}/standard", method = {RequestMethod.GET}, produces = MediaType.IMAGE_PNG_VALUE)
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
-    public byte[] getStandard(@PathVariable("imageId") String imageId,HttpServletResponse response) throws IOException {
+    public byte[] getStandard(@PathVariable("imageId") String imageId, HttpServletResponse response) throws IOException {
         try {
             return imageService.getStandardBytesByImageId(imageId);
         } catch (Exception e) {

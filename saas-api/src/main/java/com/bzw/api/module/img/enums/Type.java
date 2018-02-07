@@ -1,6 +1,13 @@
 package com.bzw.api.module.img.enums;
 
+/**
+ * @author yanbin
+ */
+
 public enum  Type {
+    /**
+     * 类型
+     */
     NoType(0, "无分类"),
             ;
 

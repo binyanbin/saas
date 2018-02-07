@@ -1,5 +1,8 @@
 package com.bzw.api.module.main.dto;
 
+/**
+ * @author yanbin
+ */
 public class IdName {
     private Integer id;
     private String name;

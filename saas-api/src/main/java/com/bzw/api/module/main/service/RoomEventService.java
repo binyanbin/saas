@@ -70,8 +70,8 @@ public class RoomEventService {
     public boolean open(Long roomId, Long employeeId) {
         Date now = new Date();
         Room room = roomQueryBiz.getRoom(roomId);
-        Preconditions.checkArgument(room != null, WarnMessage.NOT_FOUND_ROOM);
-        Preconditions.checkArgument(room.getBizStatusId().equals(RoomState.free.getValue()) ||
+        Preconditions.checkNotNull(room , WarnMessage.NOT_FOUND_ROOM);
+        Preconditions.checkState(room.getBizStatusId().equals(RoomState.free.getValue()) ||
                 room.getBizStatusId().equals(RoomState.booked.getValue()), WarnMessage.ROOM_USED);
         recordChangeEventBiz.add(RecordChangeType.room, room.getId(), room.getTenantId(), now,
                 String.format(LogConstants.ROOM_OPEN_LOG, DtUtils.toDateString(now)));
@@ -84,8 +84,8 @@ public class RoomEventService {
     public boolean book(Long roomId, Long employeeId) {
         Date now = new Date();
         Room room = roomQueryBiz.getRoom(roomId);
-        Preconditions.checkArgument(room != null, WarnMessage.NOT_FOUND_ROOM);
-        Preconditions.checkArgument(room.getBizStatusId().equals(RoomState.free.getValue()), WarnMessage.ROOM_USED);
+        Preconditions.checkNotNull(room, WarnMessage.NOT_FOUND_ROOM);
+        Preconditions.checkState(room.getBizStatusId().equals(RoomState.free.getValue()), WarnMessage.ROOM_USED);
         recordChangeEventBiz.add(RecordChangeType.room, room.getId(), room.getTenantId(), now,
                 String.format(LogConstants.ROOM_BOOK_LOG, DtUtils.toDateString(now)));
         return updateRoomState(room, employeeId, RoomState.booked.getValue());
@@ -97,10 +97,10 @@ public class RoomEventService {
     public boolean finish(Long roomId, Long employeeId) {
         Room room = roomQueryBiz.getRoom(roomId);
         Date now = new Date();
-        Preconditions.checkArgument(room != null, WarnMessage.NOT_FOUND_ROOM);
+        Preconditions.checkNotNull(room , WarnMessage.NOT_FOUND_ROOM);
         Order order = orderQueryBiz.getOrder(room.getOrderId());
-        Preconditions.checkArgument(order != null, WarnMessage.NOT_FOUND_ORDER);
-        Preconditions.checkArgument(order.getBizStatusId().equals(OrderState.paid.getValue()), WarnMessage.NO_PAID);
+        Preconditions.checkNotNull(order , WarnMessage.NOT_FOUND_ORDER);
+        Preconditions.checkState(order.getBizStatusId().equals(OrderState.paid.getValue()), WarnMessage.NO_PAID);
         List<OrderDetail> orderDetailList = orderQueryBiz.listOrderDetail(order.getId());
         order.setBizStatusId(OrderState.finish.getValue());
         order.setModifiedTime(now);
@@ -134,7 +134,7 @@ public class RoomEventService {
      */
     public boolean cancel(Long roomId, Long employeeId) {
         Room room = roomQueryBiz.getRoom(roomId);
-        Preconditions.checkArgument(room != null, WarnMessage.NOT_FOUND_ROOM);
+        Preconditions.checkNotNull(room, WarnMessage.NOT_FOUND_ROOM);
         Date now = new Date();
         Order order = orderQueryBiz.getOrder(room.getOrderId());
         List<OrderDetail> orderDetailList = orderQueryBiz.listOrderDetail(order.getId());
@@ -238,7 +238,7 @@ public class RoomEventService {
 
     public boolean update(RoomParam roomParam, Long id, Long employeeId) {
         Room room = roomQueryBiz.getRoom(id);
-        if (room.getStatusId().equals(Status.Delete.getValue())){
+        if (room.getStatusId().equals(Status.Delete.getValue())) {
             return false;
         }
         Date now = new Date();
@@ -257,7 +257,7 @@ public class RoomEventService {
         return roomEventBiz.update(room);
     }
 
-    public boolean delete(Long id) {
-        return roomEventBiz.delete(id);
+    public boolean delete(Long id, Long employeeId) {
+        return roomEventBiz.delete(id, employeeId);
     }
 }

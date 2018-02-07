@@ -9,6 +9,8 @@ public enum ApplicationErrorCode {
      */
     ArgumentsIncorrect("10001", "参数不正确"),
     InvalidAccessToken("10010", "会话已失效,请重新登录"),
+    IllegalStateException("10011","状态不正确"),
+    NullPointerException("10012","对象不存在"),
     UnKnowException("10014", "发生未知异常"),
     NoHandlerFound("10015","无效的请求路径"),
     UserLoginFail("10016","登陆失败，请重新登陆"),

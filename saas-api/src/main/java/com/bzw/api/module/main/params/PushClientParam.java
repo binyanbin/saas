@@ -1,5 +1,8 @@
 package com.bzw.api.module.main.params;
 
+/**
+ * @author yanbin
+ */
 public class PushClientParam {
 
     private Long technicianId;

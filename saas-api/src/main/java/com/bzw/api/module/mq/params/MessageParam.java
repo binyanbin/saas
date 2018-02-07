@@ -1,5 +1,8 @@
 package com.bzw.api.module.mq.params;
 
+/**
+ * @author yanbin
+ */
 public class MessageParam {
     private String sender;
     private String receiver;

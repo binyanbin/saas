@@ -1,4 +1,4 @@
-package com.bzw.api.module.main.constant;
+package com.bzw.api.module.mq.constants;
 
 /**
  * @author yanbin

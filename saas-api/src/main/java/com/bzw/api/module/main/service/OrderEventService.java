@@ -75,8 +75,8 @@ public class OrderEventService {
      */
     public Long addOrderForDesk(List<OrderParam> orderParams, Long userId, Long roomId) {
         Room room = roomQueryBiz.getRoom(roomId);
-        Preconditions.checkArgument(room != null, WarnMessage.NOT_FOUND_ROOM);
-        Preconditions.checkArgument(room.getBizStatusId().equals(RoomState.free.getValue()), WarnMessage.ROOM_USED);
+        Preconditions.checkNotNull(room, WarnMessage.NOT_FOUND_ROOM);
+        Preconditions.checkState(room.getBizStatusId().equals(RoomState.free.getValue()), WarnMessage.ROOM_USED);
         Long orderId = sequenceService.newKey(SeqType.order);
         User user = userQueryBiz.getUser(userId);
         if (user != null) {
@@ -98,7 +98,7 @@ public class OrderEventService {
             if (room == null) {
                 return null;
             }
-            Preconditions.checkArgument(room.getBizStatusId().equals(RoomState.open.getValue()) ||
+            Preconditions.checkState(room.getBizStatusId().equals(RoomState.open.getValue()) ||
                     room.getBizStatusId().equals(RoomState.waiting.getValue()), "已服务，无法修改订单");
             return addOrder(orderId, orderParams, true, userId, room, user.getWechatId());
         } else {
@@ -120,7 +120,7 @@ public class OrderEventService {
         } else {
             message = WarnMessage.ROOM_USED;
         }
-        Preconditions.checkArgument(room.getBizStatusId().equals(RoomState.open.getValue()), message);
+        Preconditions.checkState(room.getBizStatusId().equals(RoomState.open.getValue()), message);
         Long orderId = sequenceService.newKey(SeqType.order);
         return addOrder(orderId, orderParams, false, null, room, openId);
     }
@@ -135,8 +135,8 @@ public class OrderEventService {
         if (room == null) {
             return null;
         }
-        Preconditions.checkArgument(room.getBizStatusId().equals(RoomState.open.getValue()) ||
-                room.getBizStatusId().equals(RoomState.waiting.getValue()), "已服务，无法修改订单");
+        Preconditions.checkState(room.getBizStatusId().equals(RoomState.open.getValue()) ||
+                room.getBizStatusId().equals(RoomState.waiting.getValue()), WarnMessage.SERVICE_BEGIN);
 
         return addOrder(orderId, orderParams, true, null, room, openId);
     }
@@ -147,8 +147,8 @@ public class OrderEventService {
     public OrderDetail serve(Long orderDetailId) {
         Date now = new Date();
         OrderDetail orderDetail = orderQueryBiz.getOrderDetail(orderDetailId);
-        Preconditions.checkArgument(orderDetail != null, WarnMessage.NOT_FOUND_ORDER);
-        Preconditions.checkArgument(orderDetail.getBizStatusId().equals(OrderDetailState.booked.getValue()), WarnMessage.TECHNICIAN_SERVING);
+        Preconditions.checkNotNull(orderDetail, WarnMessage.NOT_FOUND_ORDER);
+        Preconditions.checkState(orderDetail.getBizStatusId().equals(OrderDetailState.booked.getValue()), WarnMessage.TECHNICIAN_SERVING);
         Order order = orderQueryBiz.getOrder(orderDetail.getOrderId());
         Technician technician = technicianQueryBiz.getTechnicianById(orderDetail.getTechnicianId());
         if (technician == null) {
@@ -241,8 +241,8 @@ public class OrderEventService {
      */
     public Order pay(Long orderId, BigDecimal price) {
         Order order = orderQueryBiz.getOrder(orderId);
-        Preconditions.checkArgument(order != null, WarnMessage.NOT_FOUND_ORDER);
-        Preconditions.checkArgument(order.getBizStatusId().equals(OrderState.non_payment.getValue()),WarnMessage.ORDER_PAID);
+        Preconditions.checkNotNull(order, WarnMessage.NOT_FOUND_ORDER);
+        Preconditions.checkState(order.getBizStatusId().equals(OrderState.non_payment.getValue()), WarnMessage.ORDER_PAID);
         if (price == null) {
             price = order.getPrice();
         }

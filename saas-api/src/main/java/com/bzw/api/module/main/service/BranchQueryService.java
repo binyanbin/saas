@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * @author yanbin
+ */
 @Service
 public class BranchQueryService {
 
@@ -45,5 +48,9 @@ public class BranchQueryService {
             result.add(mapToBranchDTO(branch));
         }
         return result;
+    }
+
+    public BranchDTO getBranch(Long id){
+        return mapToBranchDTO(branchQueryBiz.getBranch(id));
     }
 }

@@ -1,7 +1,7 @@
 package com.bzw.api.module.third.service;
 
 import com.bzw.api.module.base.model.Sms;
-import com.bzw.api.module.main.constant.ExternalUrl;
+import com.bzw.api.module.mq.constants.ExternalUrl;
 import com.bzw.api.module.third.biz.SmsEventBiz;
 import com.bzw.api.module.third.constants.SmsConstants;
 import com.bzw.common.cache.CacheKeyPrefix;

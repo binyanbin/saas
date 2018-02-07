@@ -1,5 +1,8 @@
 package com.bzw.api.module.main.constant;
 
+/**
+ * @author yanbin
+ */
 public class LogConstants {
     public static final String ORDER_CREATE_LOG = "订单于 %s 创建";
     public static final String ORDER_MODIFY_LOG = "订单于 %s 修改";

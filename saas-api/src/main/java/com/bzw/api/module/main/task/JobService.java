@@ -24,7 +24,7 @@ import java.util.List;
 @Component
 public class JobService {
 
-    private final static long ONE_Minute = 60 * 1000;
+    private final static long ONE_MINUTE = 60 * 1000;
 
     @Autowired
     private RoomQueryBiz roomQueryBiz;
@@ -43,7 +43,7 @@ public class JobService {
 
 
 
-    @Scheduled(fixedDelay = ONE_Minute * 2, initialDelay = ONE_Minute)
+    @Scheduled(fixedDelay = ONE_MINUTE * 2, initialDelay = ONE_MINUTE)
     public void finishOrder() {
         Date now = new Date();
         List<Room> roomList = roomQueryBiz.listRoomByRoomSate(RoomState.unfinished);
@@ -73,7 +73,7 @@ public class JobService {
         }
     }
 
-//    @Scheduled(fixedDelay = ONE_Minute)
+//    @Scheduled(fixedDelay = ONE_MINUTE)
 //    public void finishMessage() {
 //        Map<String, WebSocket> mapSocket = WebSocket.getWebSocketMap();
 //        for (Map.Entry<String, WebSocket> entry : mapSocket.entrySet()) {

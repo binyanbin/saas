@@ -7,6 +7,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * @author yanbin
+ */
 public class Image {
 
     public static BufferedImage resizeImageWithHint(BufferedImage image, int maxSideLength) {
@@ -19,17 +22,14 @@ public class Image {
         } else {
             scaleFactor = ((double) maxSideLength / originalHeight);
         }
-        // create new image
         if (scaleFactor < 1 && (int) Math.round(originalWidth * scaleFactor) > 1 && (int) Math.round(originalHeight * scaleFactor) > 1) {
-//            BufferedImage img = new BufferedImage((int) Math.round(originalWidth * scaleFactor), (int) Math.round(originalHeight * scaleFactor), BufferedImage.TYPE_INT_RGB);
             BufferedImage img;
-            if (image.getType() != 0)
+            if (image.getType() != 0) {
                 img = new BufferedImage((int) Math.round(originalWidth * scaleFactor), (int) Math.round(originalHeight * scaleFactor), image.getType());
-            else
+            } else {
                 img = new BufferedImage((int) Math.round(originalWidth * scaleFactor), (int) Math.round(originalHeight * scaleFactor), BufferedImage.TYPE_INT_RGB);
-            // fast scale (Java 1.4 & 1.5)
+            }
             Graphics g = img.getGraphics();
-//        ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
             ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             g.drawImage(image, 0, 0, img.getWidth(), img.getHeight(), null);
             return img;

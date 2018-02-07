@@ -17,6 +17,19 @@ public class RoomDTO {
     private Integer bedNumber;
     private Date startTime;
     private Date overTime;
+    private String description;
+
+    public Boolean getHaveRestRoom() {
+        return haveRestRoom;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public Date getStartTime() {
         return startTime;

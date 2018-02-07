@@ -1,5 +1,8 @@
 package com.bzw.api.module.main.params;
 
+/**
+ * @author yanbin
+ */
 public class BranchParam {
     private String phone;
     private String address;

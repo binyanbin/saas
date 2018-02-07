@@ -9,12 +9,14 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
+/**
+ * @author yanbin
+ */
 @Service
 public class PictureQueryBiz {
 
     @Autowired
     private PictureMapper pictureMapper;
-
 
     public Picture getPicture(String imgId) {
         PictureExample pictureExample = new PictureExample();

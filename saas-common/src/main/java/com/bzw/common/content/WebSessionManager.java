@@ -18,7 +18,7 @@ import java.util.UUID;
 @Component
 public class WebSessionManager {
 
-    private static final int timeout = 1000 * 60 * 24 * 7;
+    private static final int TIMEOUT = 1000 * 60 * 24 * 7;
 
     private ICacheClient cacheClient;
 
@@ -78,7 +78,7 @@ public class WebSessionManager {
         String cacheValue = cacheClient.get(cacheKey);
         WebSession webSession = new Gson().fromJson(cacheValue, WebSession.class);
         if (null != webSession) {
-            cacheClient.touch(cacheKey, timeout);
+            cacheClient.touch(cacheKey, TIMEOUT);
         }
         return webSession;
     }

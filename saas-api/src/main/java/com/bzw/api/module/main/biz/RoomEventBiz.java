@@ -7,6 +7,8 @@ import com.bzw.common.enums.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 /**
  * @author yanbin
  */
@@ -30,12 +32,14 @@ public class RoomEventBiz {
         roomMapper.insert(room);
     }
 
-    public boolean delete(Long id) {
+    public boolean delete(Long id,Long employeeId) {
         Room room = roomMapper.selectByPrimaryKey(id);
         if (room == null) {
             return false;
         }
         room.setStatusId(Status.Delete.getValue());
+        room.setModifiedId(employeeId);
+        room.setModifiedTime(new Date());
         return roomMapper.updateByPrimaryKey(room) > 0;
     }
 }
