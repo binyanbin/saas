@@ -6,7 +6,7 @@ import com.bzw.api.module.main.enums.ProjectType;
 import com.bzw.api.module.main.enums.RoleType;
 import com.bzw.api.module.main.enums.RoomState;
 import com.bzw.api.module.main.enums.TechnicianState;
-import com.bzw.common.enums.Status;
+import com.bzw.common.system.Status;
 import com.bzw.common.sequence.SeqType;
 import com.bzw.common.sequence.SequenceService;
 import com.bzw.common.utils.Sha256;

@@ -11,6 +11,7 @@ public enum SeqType {
     User("pl_user", "userMapper"),
     branch("biz_branch", "branchMapper"),
     employee("biz_employee", "employeeMapper"),
+    employeeFunction("biz_employee_function","employeeFunctionMapper"),
     order("biz_order", "orderMapper"),
     orderDetail("biz_order_detail", "orderDetailMapper"),
     parameter("biz_parameter", "parameterMapper"),

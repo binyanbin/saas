@@ -5,7 +5,7 @@ import com.bzw.api.module.img.biz.PictureEventBiz;
 import com.bzw.api.module.img.biz.PictureQueryBiz;
 import com.bzw.api.module.img.constants.Constants;
 import com.bzw.api.module.img.dto.ImageDTO;
-import com.bzw.common.enums.Status;
+import com.bzw.common.system.Status;
 import com.bzw.common.exception.api.NotFoundImageException;
 import com.bzw.common.utils.DtUtils;
 import com.bzw.common.utils.Image;

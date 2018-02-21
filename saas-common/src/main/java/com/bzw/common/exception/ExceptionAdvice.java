@@ -1,6 +1,7 @@
 package com.bzw.common.exception;
 
 import com.bzw.common.log.LogServiceImpl;
+import com.bzw.common.system.StatusType;
 import com.bzw.common.web.JsonExceptionWrapper;
 import com.bzw.common.web.JsonWrapperService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,8 @@ import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
 
 /**
  *
@@ -34,28 +37,36 @@ public class ExceptionAdvice {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public JsonExceptionWrapper handleHttpMessageNotReadableException(
             HttpMessageNotReadableException e) {
-        return wrapperException(e);
+        return getJsonExceptionWrapper(e);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public JsonExceptionWrapper handleHttpRequestMethodNotSupportedException(
             HttpRequestMethodNotSupportedException e) {
-        return wrapperException(e);
+        return getJsonExceptionWrapper(e);
     }
 
 
     @ResponseStatus(HttpStatus.OK)
     @ExceptionHandler({HttpMediaTypeNotAcceptableException.class})
     public JsonExceptionWrapper handHttpMediaTypeNotAcceptableException(HttpMediaTypeNotAcceptableException e) {
-        return wrapperException(e);
+        return getJsonExceptionWrapper(e);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public JsonExceptionWrapper handleHttpMediaTypeNotSupportedException(
             Exception e) {
-        return wrapperException(e);
+        return getJsonExceptionWrapper(e);
+    }
+
+    private JsonExceptionWrapper getJsonExceptionWrapper(Exception e) {
+        JsonExceptionWrapper exceptionWrapper = new JsonExceptionWrapper();
+        exceptionWrapper.setCode(String.valueOf(StatusType.ApplicationException.getStatusCode()));
+        exceptionWrapper.setStackTrace(Arrays.toString(e.getStackTrace()));
+        exceptionWrapper.setMsg(StatusType.ApplicationException.getDescription());
+        return exceptionWrapper;
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -67,6 +78,7 @@ public class ExceptionAdvice {
     private JsonExceptionWrapper wrapperException(Throwable e) {
         JsonExceptionWrapper jsonExceptionWrapper = jsonWrapperService.getJsonExceptionWrapper(e);
         logServiceImpl.insertExcept(jsonExceptionWrapper,e);
+        jsonExceptionWrapper.setCode(String.valueOf(StatusType.ApplicationBug));
         return jsonExceptionWrapper;
     }
 }

@@ -12,7 +12,7 @@ import com.bzw.api.module.main.service.TechnicianEventService;
 import com.bzw.api.module.main.service.TechnicianQueryService;
 import com.bzw.common.content.ApiMethodAttribute;
 import com.bzw.common.content.DuplicationSubmit;
-import com.bzw.common.enums.BusinessType;
+import com.bzw.common.system.BusinessType;
 import com.bzw.common.utils.WebUtils;
 import com.bzw.common.web.BaseController;
 import com.google.common.base.Preconditions;

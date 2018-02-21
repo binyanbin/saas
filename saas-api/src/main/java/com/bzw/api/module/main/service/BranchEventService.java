@@ -5,7 +5,7 @@ import com.bzw.api.module.main.biz.BranchEventBiz;
 import com.bzw.api.module.main.biz.BranchQueryBiz;
 import com.bzw.api.module.main.dto.BranchDTO;
 import com.bzw.api.module.main.params.BranchParam;
-import com.bzw.common.enums.Status;
+import com.bzw.common.system.Status;
 import com.bzw.common.sequence.SeqType;
 import com.bzw.common.sequence.SequenceService;
 import org.springframework.beans.factory.annotation.Autowired;

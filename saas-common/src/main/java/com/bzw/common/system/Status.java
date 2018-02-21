@@ -1,20 +1,22 @@
-package com.bzw.common.enums;
+package com.bzw.common.system;
 
 /**
  * @author yanbin
  */
-public enum BusinessType {
+
+public enum  Status {
     /**
-     * 业务
+     * 数据状态
      */
-    NULL(-1,"无"),
-    weChatOrder(1, "微信预定"),
-    appOrder(2,"app预定"),
-    ;
+    Valid(1, "启用"),
+    Invalid(0, "禁用"),
+    Delete(2, "删除"),;
+
     private Integer value;
+
     private String desc;
 
-    BusinessType(Integer value, String desc) {
+    private Status(Integer value, String desc) {
         this.value = value;
         this.desc = desc;
     }
@@ -27,20 +29,24 @@ public enum BusinessType {
         this.value = value;
     }
 
-    public static BusinessType parse(Integer value) {
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+    public static Status parse(Integer value) {
         if (null == value) {
             return null;
         }
-        BusinessType[] coll = BusinessType.values();
-        for (BusinessType item : coll) {
+        Status[] coll = values();
+        for (Status item : coll) {
             if (item.getValue().equals(value)) {
                 return item;
             }
         }
         return null;
-    }
-
-    public String getDesc() {
-        return desc;
     }
 }

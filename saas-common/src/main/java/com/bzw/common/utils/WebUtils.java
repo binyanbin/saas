@@ -3,7 +3,7 @@ package com.bzw.common.utils;
 import com.bzw.common.content.ThreadWebContextHolder;
 import com.bzw.common.content.WebContext;
 import com.bzw.common.content.WebSession;
-import com.bzw.common.enums.Constants;
+import com.bzw.common.system.Constants;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;

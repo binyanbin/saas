@@ -6,7 +6,7 @@ import com.bzw.api.module.base.model.Employee;
 import com.bzw.api.module.base.model.EmployeeExample;
 import com.bzw.api.module.base.model.User;
 import com.bzw.api.module.base.model.UserExample;
-import com.bzw.common.enums.Status;
+import com.bzw.common.system.Status;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,19 +43,25 @@ public class UserQueryBiz {
         }
     }
 
+    public Employee getEmployee(Long id) {
+        return employeeMapper.selectByPrimaryKey(id);
+    }
+
     public List<User> listUserByPhone(String phone) {
         UserExample userExample = new UserExample();
         userExample.createCriteria().andPhoneEqualTo(phone).andStatusIdEqualTo(Status.Valid.getValue());
         return userMapper.selectByExample(userExample);
     }
 
-    public List<Employee> listEmployeeByUsers(List<User> users){
+    public List<Employee> listEmployeeByUsers(List<User> users) {
         List<Long> userIds = Lists.newArrayList();
-        for (User user :users){
+        for (User user : users) {
             userIds.add(user.getId());
         }
         EmployeeExample employeeExample = new EmployeeExample();
         employeeExample.createCriteria().andUserIdIn(userIds).andStatusIdEqualTo(Status.Valid.getValue());
-        return  employeeMapper.selectByExample(employeeExample);
+        return employeeMapper.selectByExample(employeeExample);
     }
+
+
 }

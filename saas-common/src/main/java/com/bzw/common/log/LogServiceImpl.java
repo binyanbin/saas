@@ -1,7 +1,7 @@
 package com.bzw.common.log;
 
 import com.bzw.common.content.WebSession;
-import com.bzw.common.enums.Constants;
+import com.bzw.common.system.Constants;
 import com.bzw.common.log.model.Daily;
 import com.bzw.common.log.model.ExceptionInfo;
 import com.bzw.common.log.model.TimeoutInfo;

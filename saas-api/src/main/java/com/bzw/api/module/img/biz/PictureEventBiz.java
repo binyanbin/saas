@@ -4,7 +4,7 @@ import com.bzw.api.module.base.dao.PictureMapper;
 import com.bzw.api.module.img.enums.Source;
 import com.bzw.api.module.img.enums.Type;
 import com.bzw.api.module.base.model.Picture;
-import com.bzw.common.enums.Status;
+import com.bzw.common.system.Status;
 import com.bzw.common.sequence.SeqType;
 import com.bzw.common.sequence.SequenceService;
 import com.bzw.common.utils.UuidUtil;

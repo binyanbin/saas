@@ -4,7 +4,7 @@ import com.bzw.api.module.base.dao.ProjectMapper;
 import com.bzw.api.module.base.dao.RoomMapper;
 import com.bzw.api.module.base.dao.TechnicianProjectMapper;
 import com.bzw.api.module.base.model.*;
-import com.bzw.common.enums.Status;
+import com.bzw.common.system.Status;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;

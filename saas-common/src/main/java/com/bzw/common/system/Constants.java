@@ -1,4 +1,4 @@
-package com.bzw.common.enums;
+package com.bzw.common.system;
 
 /**
  * @author yanbin

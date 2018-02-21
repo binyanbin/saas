@@ -11,9 +11,9 @@ import com.bzw.api.module.main.enums.OrderDetailState;
 import com.bzw.api.module.main.enums.TechnicianState;
 import com.bzw.api.module.main.params.PhotoParam;
 import com.bzw.api.module.main.params.TechnicianParam;
-import com.bzw.common.enums.Status;
 import com.bzw.common.sequence.SeqType;
 import com.bzw.common.sequence.SequenceService;
+import com.bzw.common.system.Status;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
@@ -48,6 +48,7 @@ public class TechnicianEventService {
     @Autowired
     private TechnicianQueryService technicianQueryService;
 
+    //region 评价
     /**
      * 评价技师
      */
@@ -59,19 +60,13 @@ public class TechnicianEventService {
         Preconditions.checkState(orderDetail.getBizStatusId().equals(OrderDetailState.finished.getValue()), WarnMessage.SERVICE_NOT_FINISH);
         orderDetail.setBizStatusId(OrderDetailState.access.getValue());
         orderEventBiz.updateOrderDetail(orderDetail);
+        Long accessId = addAccess(technicianId, orderDetailId, grade, openId, technician);
+        addAccessTag(technicianId, tag, technician, accessId);
+    }
 
-        Long accessId = sequenceService.newKey(SeqType.technicianAssess);
-        TechnicianAssess technicianAssess = new TechnicianAssess();
-        technicianAssess.setId(accessId);
-        technicianAssess.setGrade(grade);
-        technicianAssess.setOrderDetailId(orderDetailId);
-        technicianAssess.setWechatId(openId);
-        technicianAssess.setTechnicianId(technicianId);
-        technicianAssess.setTenantId(technician.getTenantId());
-        technicianAssess.setBranchId(technician.getBranchId());
-        technicianEventBiz.addTechnicianAccess(technicianAssess);
-        List<TechnicianTag> technicianTagList = Lists.newArrayList();
+    private void addAccessTag(Long technicianId, String tag, Technician technician, Long accessId) {
         if (StringUtils.isNotBlank(tag)) {
+            List<TechnicianTag> technicianTagList = Lists.newArrayList();
             String[] tags = tag.split(",");
             List<Long> tagIds = sequenceService.newKeys(SeqType.technicianTag, tags.length);
             int i = 0;
@@ -92,6 +87,21 @@ public class TechnicianEventService {
             }
         }
     }
+
+    private Long addAccess(Long technicianId, Long orderDetailId, Integer grade, String openId, Technician technician) {
+        Long accessId = sequenceService.newKey(SeqType.technicianAssess);
+        TechnicianAssess technicianAssess = new TechnicianAssess();
+        technicianAssess.setId(accessId);
+        technicianAssess.setGrade(grade);
+        technicianAssess.setOrderDetailId(orderDetailId);
+        technicianAssess.setWechatId(openId);
+        technicianAssess.setTechnicianId(technicianId);
+        technicianAssess.setTenantId(technician.getTenantId());
+        technicianAssess.setBranchId(technician.getBranchId());
+        technicianEventBiz.addTechnicianAccess(technicianAssess);
+        return accessId;
+    }
+    //endregion
 
     /**
      * 释放技师

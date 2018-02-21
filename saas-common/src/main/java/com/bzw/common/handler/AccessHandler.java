@@ -3,7 +3,7 @@ package com.bzw.common.handler;
 import com.bzw.common.cache.CacheKeyPrefix;
 import com.bzw.common.cache.RedisClient;
 import com.bzw.common.content.*;
-import com.bzw.common.enums.Constants;
+import com.bzw.common.system.Constants;
 import com.bzw.common.exception.api.DuplicationException;
 import com.bzw.common.exception.api.InvalidAccessTokenException;
 import com.bzw.common.exception.api.InvalidSignException;

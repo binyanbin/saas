@@ -3,14 +3,14 @@ package com.bzw.api.module.main.controller;
 import com.bzw.api.module.base.model.Employee;
 import com.bzw.api.module.base.model.User;
 import com.bzw.api.module.main.constant.WarnMessage;
-import com.bzw.api.module.main.params.LoginParam;
-import com.bzw.api.module.main.service.UserQueryService;
+import com.bzw.api.module.main.params.UserParam;
 import com.bzw.api.module.main.service.OrderQueryService;
-import com.bzw.api.module.third.service.BaiduService;
+import com.bzw.api.module.main.service.UserEventService;
+import com.bzw.api.module.main.service.UserQueryService;
 import com.bzw.api.module.third.service.SmsService;
 import com.bzw.api.module.third.service.WcService;
 import com.bzw.common.content.ApiMethodAttribute;
-import com.bzw.common.exception.api.UserLoginFailException;
+import com.bzw.common.exception.ApplicationErrorCode;
 import com.bzw.common.utils.WebUtils;
 import com.bzw.common.web.BaseController;
 import com.google.common.base.Preconditions;
@@ -31,7 +31,7 @@ import java.util.List;
 public class UserController extends BaseController {
 
     @Autowired
-    private BaiduService.CustomerEventService customerEventService;
+    private UserEventService userEventService;
 
     @Autowired
     private UserQueryService userQueryService;
@@ -58,22 +58,22 @@ public class UserController extends BaseController {
         }
     }
 
-    @RequestMapping(value = "/login", method = {RequestMethod.OPTIONS, RequestMethod.POST})
-    @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
-    public Object login(@RequestBody LoginParam loginParam) {
-        return wrapperJsonView(customerEventService.login(loginParam.getCode(), loginParam.getPassword()));
-    }
+//    @RequestMapping(value = "/login", method = {RequestMethod.OPTIONS, RequestMethod.POST})
+//    @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
+//    public Object login(@RequestBody LoginParam loginParam) {
+//        return wrapperJsonView(customerEventService.login(loginParam.getCode(), loginParam.getPassword()));
+//    }
 
     @RequestMapping(value = "/login/{openId}", method = {RequestMethod.OPTIONS, RequestMethod.POST})
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
     public Object openIdLogin(@PathVariable String openId) {
-        return wrapperJsonView(customerEventService.openIdLogin(openId));
+        return wrapperJsonView(userEventService.openIdLogin(openId));
     }
 
     @RequestMapping(value = "/login/{phone}/{smsCode}", method = {RequestMethod.OPTIONS, RequestMethod.POST})
     @ApiMethodAttribute(nonSessionValidation = true, nonSignatureValidation = true)
     public Object smsCodeLogin(@PathVariable String phone, @PathVariable String smsCode) {
-        return wrapperJsonView(customerEventService.loginBySmsCode(phone, smsCode));
+        return wrapperJsonView(userEventService.loginBySmsCode(phone, smsCode));
     }
 
     @RequestMapping(value = "/login/code/{jscode}", method = {RequestMethod.OPTIONS, RequestMethod.POST})
@@ -81,9 +81,9 @@ public class UserController extends BaseController {
     public Object codeLogin(@PathVariable String jscode) {
         String openId = wcService.getOpenId(jscode);
         if (null == openId) {
-            throw new UserLoginFailException();
+            return wrapperBusinessException(ApplicationErrorCode.OpenIdLoginFail.getReasoning());
         }
-        return wrapperJsonView(customerEventService.openIdLogin(openId));
+        return wrapperJsonView(userEventService.openIdLogin(openId));
     }
 
     @RequestMapping(value = "openId/{jscode}")
@@ -108,7 +108,12 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/bind/{openId}", method = {RequestMethod.OPTIONS, RequestMethod.POST})
     @ApiMethodAttribute(nonSignatureValidation = true)
     public Object bindUser(@PathVariable String openId) {
-        return wrapperJsonView(customerEventService.bindOpenId(WebUtils.Session.getEmployeeId(), openId));
+        return wrapperJsonView(userEventService.bindOpenId(WebUtils.Session.getEmployeeId(), openId));
     }
 
+    @RequestMapping(value = "/", method = {RequestMethod.OPTIONS, RequestMethod.POST})
+    @ApiMethodAttribute(nonSignatureValidation = true)
+    public Object add(@RequestBody UserParam userParam) {
+        return wrapperJsonView(userEventService.add(userParam, WebUtils.Session.getEmployeeId(), WebUtils.Session.getTenantId(), WebUtils.Session.getBranchId(), WebUtils.Session.getBranchName()));
+    }
 }

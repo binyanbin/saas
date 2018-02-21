@@ -8,7 +8,7 @@ import com.bzw.api.module.base.model.Project;
 import com.bzw.api.module.base.model.Room;
 import com.bzw.api.module.base.model.RoomExample;
 import com.bzw.api.module.main.enums.RoomState;
-import com.bzw.common.enums.Status;
+import com.bzw.common.system.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

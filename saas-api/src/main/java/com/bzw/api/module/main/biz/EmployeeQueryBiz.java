@@ -3,7 +3,7 @@ package com.bzw.api.module.main.biz;
 import com.bzw.api.module.base.dao.EmployeeMapper;
 import com.bzw.api.module.base.model.Employee;
 import com.bzw.api.module.base.model.EmployeeExample;
-import com.bzw.common.enums.Status;
+import com.bzw.common.system.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

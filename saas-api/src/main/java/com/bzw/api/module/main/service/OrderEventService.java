@@ -281,25 +281,10 @@ public class OrderEventService {
             projectIds.add(orderParam.getProjectId());
             technicianIds.add(orderParam.getTechnicianId());
         }
-        List<Project> projects = projectQueryBiz.listProjectByIds(projectIds);
-        Map<Integer, Project> mapProject = Maps.newHashMap();
-        if (!CollectionUtils.isEmpty(projects)) {
-            projects.forEach(t -> mapProject.put(t.getId(), t));
-        }
 
+        Map<Integer, Project> mapProject = getIntegerProjectMap(projectIds);
         List<Technician> technicians = technicianQueryBiz.listTechnicianByIds(technicianIds);
-        Map<Long, Technician> mapTechnician = Maps.newHashMap();
-        if (!CollectionUtils.isEmpty(technicians)) {
-            for (Technician technician : technicians) {
-                if (technician.getBizStatusId().equals(TechnicianState.free.getValue())) {
-                    technician.setBizStatusId(TechnicianState.booked.getValue());
-                    mapTechnician.put(technician.getId(), technician);
-                } else if (technician.getBizStatusId().equals(TechnicianState.serving.getValue())) {
-                    technician.setBizStatusId(TechnicianState.servingAndBooked.getValue());
-                    mapTechnician.put(technician.getId(), technician);
-                }
-            }
-        }
+        Map<Long,Technician> mapTechnician = getTechnicianMap(technicians);
 
         BigDecimal totalPrice = new BigDecimal(0);
         List<OrderDetail> orderDetails = Lists.newArrayList();
@@ -309,23 +294,7 @@ public class OrderEventService {
                     mapTechnician.containsKey(orderParams.get(i).getTechnicianId())) {
                 Project project = mapProject.get(orderParams.get(i).getProjectId());
                 Technician technician = mapTechnician.get(orderParams.get(i).getTechnicianId());
-                OrderDetail orderDetail = new OrderDetail();
-                orderDetail.setBizStatusId(OrderDetailState.booked.getValue());
-                orderDetail.setTenantId(room.getTenantId());
-                orderDetail.setBranchId(branchId);
-                orderDetail.setId(detailIds.get(i));
-                orderDetail.setBookTime(now);
-                orderDetail.setOrderId(order.getId());
-                orderDetail.setRoomId(room.getId());
-                orderDetail.setProjectId(orderParams.get(i).getProjectId());
-                orderDetail.setTechnicianId(orderParams.get(i).getTechnicianId());
-                orderDetail.setBranchName(room.getBranchName());
-                orderDetail.setPrice(project.getPrice());
-                orderDetail.setProjectName(project.getName());
-                orderDetail.setTechnicianName(technician.getName());
-                orderDetail.setRoomName(room.getName());
-                orderDetail.setTypeId(OrderType.CustomerReservation.getValue());
-                orderDetail.setDuration(project.getDuration());
+                OrderDetail orderDetail = getOrderDetail(orderParams.get(i), room, now, branchId, order, detailIds.get(i), project, technician);
                 orderDetails.add(orderDetail);
                 totalPrice = totalPrice.add(project.getPrice());
                 PushTechnicianParam pushTechnicianParam = new PushTechnicianParam();
@@ -361,14 +330,8 @@ public class OrderEventService {
                 String.format(LogConstants.ROOM_BOOK_LOG, DtUtils.toDateString(now)));
 
         technicianEventBiz.updateList(technicians);
-        for (PushTechnicianParam pushTechnicianParam : pushTechnicianParams) {
-            String message = gson.toJson(pushTechnicianParam);
-            MessageParam messageParam = new MessageParam();
-            messageParam.setJson(message);
-            messageParam.setReceiver(branchId.toString());
-            messageParam.setMessage(pushTechnicianParam.getTxt());
-            mqProducer.send(messageParam);
-        }
+
+        pushMessageToTechnician(branchId, pushTechnicianParams);
 
         if (!isUpdate) {
             recordChangeEventBiz.add(RecordChangeType.order, order.getId(), order.getTenantId(), now,
@@ -378,6 +341,63 @@ public class OrderEventService {
                     String.format(LogConstants.ORDER_MODIFY_LOG, DtUtils.toDateString(now)));
         }
         return order.getId();
+    }
+
+    private OrderDetail getOrderDetail(OrderParam orderParam, Room room, Date now, Long branchId, Order order, Long detailId,  Project project, Technician technician) {
+        OrderDetail orderDetail = new OrderDetail();
+        orderDetail.setBizStatusId(OrderDetailState.booked.getValue());
+        orderDetail.setTenantId(room.getTenantId());
+        orderDetail.setBranchId(branchId);
+        orderDetail.setId(detailId);
+        orderDetail.setBookTime(now);
+        orderDetail.setOrderId(order.getId());
+        orderDetail.setRoomId(room.getId());
+        orderDetail.setProjectId(orderParam.getProjectId());
+        orderDetail.setTechnicianId(orderParam.getTechnicianId());
+        orderDetail.setBranchName(room.getBranchName());
+        orderDetail.setPrice(project.getPrice());
+        orderDetail.setProjectName(project.getName());
+        orderDetail.setTechnicianName(technician.getName());
+        orderDetail.setRoomName(room.getName());
+        orderDetail.setTypeId(OrderType.CustomerReservation.getValue());
+        orderDetail.setDuration(project.getDuration());
+        return orderDetail;
+    }
+
+    private void pushMessageToTechnician(Long branchId, List<PushTechnicianParam> pushTechnicianParams) {
+        for (PushTechnicianParam pushTechnicianParam : pushTechnicianParams) {
+            String message = gson.toJson(pushTechnicianParam);
+            MessageParam messageParam = new MessageParam();
+            messageParam.setJson(message);
+            messageParam.setReceiver(branchId.toString());
+            messageParam.setMessage(pushTechnicianParam.getTxt());
+            mqProducer.send(messageParam);
+        }
+    }
+
+    private Map<Long, Technician> getTechnicianMap(List<Technician> technicians) {
+        Map<Long, Technician> mapTechnician = Maps.newHashMap();
+        if (!CollectionUtils.isEmpty(technicians)) {
+            for (Technician technician : technicians) {
+                if (technician.getBizStatusId().equals(TechnicianState.free.getValue())) {
+                    technician.setBizStatusId(TechnicianState.booked.getValue());
+                    mapTechnician.put(technician.getId(), technician);
+                } else if (technician.getBizStatusId().equals(TechnicianState.serving.getValue())) {
+                    technician.setBizStatusId(TechnicianState.servingAndBooked.getValue());
+                    mapTechnician.put(technician.getId(), technician);
+                }
+            }
+        }
+        return mapTechnician;
+    }
+
+    private Map<Integer, Project> getIntegerProjectMap(List<Integer> projectIds) {
+        List<Project> projects = projectQueryBiz.listProjectByIds(projectIds);
+        Map<Integer, Project> mapProject = Maps.newHashMap();
+        if (!CollectionUtils.isEmpty(projects)) {
+            projects.forEach(t -> mapProject.put(t.getId(), t));
+        }
+        return mapProject;
     }
 
 }

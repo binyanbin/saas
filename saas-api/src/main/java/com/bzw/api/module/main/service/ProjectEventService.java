@@ -5,7 +5,7 @@ import com.bzw.api.module.main.biz.ProjectEventBiz;
 import com.bzw.api.module.main.biz.ProjectQueryBiz;
 import com.bzw.api.module.main.dto.ProjectDTO;
 import com.bzw.api.module.main.params.ProjectParam;
-import com.bzw.common.enums.Status;
+import com.bzw.common.system.Status;
 import com.bzw.common.sequence.SeqType;
 import com.bzw.common.sequence.SequenceService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -2,7 +2,7 @@ package com.bzw.api.module.main.biz;
 
 import com.bzw.api.module.base.dao.*;
 import com.bzw.api.module.base.model.*;
-import com.bzw.common.enums.Status;
+import com.bzw.common.system.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

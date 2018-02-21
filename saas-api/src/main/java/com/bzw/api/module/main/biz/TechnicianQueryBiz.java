@@ -4,7 +4,7 @@ import com.bzw.api.module.base.dao.TechnicianMapper;
 import com.bzw.api.module.base.dao.TechnicianPhotoMapper;
 import com.bzw.api.module.base.dao.TechnicianProjectMapper;
 import com.bzw.api.module.base.model.*;
-import com.bzw.common.enums.Status;
+import com.bzw.common.system.Status;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

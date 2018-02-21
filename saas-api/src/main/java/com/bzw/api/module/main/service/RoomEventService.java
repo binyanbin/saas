@@ -10,7 +10,7 @@ import com.bzw.api.module.main.enums.OrderState;
 import com.bzw.api.module.main.enums.RecordChangeType;
 import com.bzw.api.module.main.enums.RoomState;
 import com.bzw.api.module.main.params.RoomParam;
-import com.bzw.common.enums.Status;
+import com.bzw.common.system.Status;
 import com.bzw.common.sequence.ISequence;
 import com.bzw.common.sequence.SeqType;
 import com.bzw.common.utils.DtUtils;
@@ -101,9 +101,12 @@ public class RoomEventService {
         Order order = orderQueryBiz.getOrder(room.getOrderId());
         Preconditions.checkNotNull(order , WarnMessage.NOT_FOUND_ORDER);
         Preconditions.checkState(order.getBizStatusId().equals(OrderState.paid.getValue()), WarnMessage.NO_PAID);
-        List<OrderDetail> orderDetailList = orderQueryBiz.listOrderDetail(order.getId());
+
         order.setBizStatusId(OrderState.finish.getValue());
         order.setModifiedTime(now);
+        orderEventBiz.update(order);
+
+        List<OrderDetail> orderDetailList = orderQueryBiz.listOrderDetail(order.getId());
         Set<Long> technicianIds = Sets.newHashSet();
         List<OrderDetail> updateOrderDetails = Lists.newArrayList();
         for (OrderDetail orderDetail : orderDetailList) {
@@ -123,7 +126,7 @@ public class RoomEventService {
                 }
             }
         }
-        orderEventBiz.update(order);
+
         orderEventBiz.updateOrderDetails(updateOrderDetails);
         freeRoom(employeeId, room, now);
         return true;
